@@ -36,4 +36,4 @@ In order to further facilitate the experiences for the visualization of 1D Riema
 
 For the reference Riemann problem already available in the repository, one can play around with data at
 
-https://giuseppe.orlando.gitlab.labos.polytechnique.fr/all_topology/
+https://hpc-maths.github.io/2025_09_two_fluid_all_topology/
