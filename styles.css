@@ -1,0 +1,84 @@
+/***************** Main Colors ****************/
+body {
+  color: #272727; 
+  background-color: #cee6ee; 
+}
+h1.title {
+  color: #1b76ee;  
+}
+h3 {
+  color: rgb(27, 118, 238);  
+}
+/* a = Links */
+a {
+  color: blue !important;
+  font-weight: bold !important;  /* force links to be bold */
+}
+.page-authors {
+  text-align: left;
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 0.5em;
+  font-weight: bold;
+}
+/* Whole left sidebar background */
+#quarto-sidebar {
+  background-color: #1b76ee !important;  /* blue */
+  color: white !important;
+  font-weight: bold;
+}
+/* Links inside sidebar */
+#quarto-sidebar a {
+  color: white !important;
+  text-decoration: none;
+  font-weight: bold;
+}
+/* Active link (current page) */
+#quarto-sidebar a.active,
+#quarto-sidebar .sidebar-item a.active {
+  color: yellow !important;
+  font-weight: bold;
+}
+/* Hover effect */
+#quarto-sidebar a:hover {
+  color: orange !important;
+  font-weight: bold;
+}
+
+/* ************** LOGOS **************/
+.page-logos {
+  display: flex;
+  justify-content: center;   /* center horizontally */
+  margin-top: 0.5em;           /* space above logos */
+  padding-bottom: 0.5em;
+}
+.page-logos img {
+  height: 70px;
+}
+/*
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+*/
+
+
+/********** Table for initial conditions ***********/
+.mytable {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mytable th, .mytable td {
+  border: 2px solid #333;
+  padding: 0.4em;
+  text-align: center;       
+  vertical-align: middle;
+}
+
+.mytable td:first-child {
+  text-align: left;         
+  word-wrap: break-word;
+}
