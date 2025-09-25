@@ -1,0 +1,8 @@
+name: quarto
+channels:
+  - conda-forge
+dependencies:
+  - jupyter
+  - numpy
+  - plotly
+  - h5py
