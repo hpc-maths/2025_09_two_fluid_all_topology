@@ -23,13 +23,8 @@ python plot_results.py RESULTS/Rusanov_Flux_order1_ite_0 --field conserved_0
 ```
 
 to visualize the volume fraction of phase 1. The order of the parameters can be find in the struct ```EquationData```in ```include/flux_base.hpp```. For the sake of completeness, we mentnion that it is: volume fraction phase 1, partial mass phase 1, momentum phase 1, specific total energy of phase 1, and then the same order for the fields associated to phase 2.\
-The parameter ```field``` can be filled with the conserved variables (from ```conserved_0``` to ```conserved_6```) or with primtive variables, such as phasic densities, pressures, velocities, speeds of sound, specific entropies, temperatures etc... Please refer to the file ```All_topology_solver.hpp``` and in particular to the function ```create_fields``` for an overview of the different options. As a matter of example, you can execute
+The parameter ```field``` can be filled with the conserved variables (from ```conserved_0``` to ```conserved_6```) or with primtive variables, such as phasic densities, pressures, velocities, speeds of sound, specific entropies, temperatures etc... Please refer to the file ```All_topology_solver.hpp``` and in particular to the function ```create_fields``` for an overview of the different options. 
 
-```bash
-python plot_results.py RESULTS/Rusanov_Flux_order1_ite_0 --field rho1
-```
-
-to visualize the density of phase 1.
 
 In order to further facilitate the experiences for the visualization of 1D Riemann problems, one can execute the jupyter notebook ```post_process_1D_Riemann
 .ipnyb``` where the routine ```plot_1D_Riemann_results``` provides visualization tools. It is sufficient to pass in input the base filename of the output, the file with the time saving (both given by the code), and the name of the fields for which post-processing is deisred (up to 2 simultaneously)
