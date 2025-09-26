@@ -39,8 +39,10 @@ You can access the test cases using the links below or through the navigation ba
 - [1D Riemann Problem](1D_RIEMANN/post_process_1D_Riemann.ipynb)
 - [2D Riemann Problem](2D_RIEMANN/post_process_2D_Riemann.ipynb)
 
-### Data reproductibility
+### Data reproducibility
 
+Please, find the source codes and post-processing scripts used to generate the data at https://github.com/hpc-maths/2025_09_two_fluid_all_topology
+We refer to **[Samurai library](https://github.com/hpc-maths/samurai/)** for the installation of the library.
 
 ### References
 
