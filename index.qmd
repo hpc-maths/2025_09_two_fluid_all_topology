@@ -13,7 +13,7 @@ reference-location: document
   <span>Marc Massot</span>
 </div>
 
-The goal here is to demonstrate the feasability of numerical simulations of a new *all-topology* two-fluid model using a standard first-order finite-volume scheme.
+The goal here is to demonstrate the feasability of numerical simulations of a new *all-topology* two-fluid model [@haegeman2025] using a standard first-order finite-volume scheme.
 
 Hereafter, we provide the abstract of the contribution in which the model is derived, as well as a link to the full preprint.<br>
 Next, details on the numerical scheme used and its implementation using the open-source **[Samurai library](https://github.com/hpc-maths/samurai/)** are given before listing the numerical test cases.<br>
@@ -27,7 +27,7 @@ Preprint available at [HAL-05249139](https://hal.science/hal-05249139)
 
 ### Numerical method and implementation
 
-The model has been implemented without the contributions related to the lift forces. We refer to the for a complete description of the model.
+The model has been implemented without the contributions related to the lift forces. We refer to [@haegeman2025] for a complete description of the model.
 Our implementation corresponds to a finite volume method on structured meshes represented by cartesian grids. On each inter-cell interface, the numerical flux is computed using an approximate Rieman solver.
 Here, we use the first-order non-conservative Rusanov scheme presented in [@crouzet2013]. Under a standard CFL condition, the scheme is positivity-preserving for the volume fraction and phasic densities.
 
