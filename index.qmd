@@ -33,10 +33,11 @@ Here, we use the first-order non-conservative Rusanov scheme presented in [@crou
 
 ### List of test cases
 
-Three types of test cases are available, a one-dimensional Riemann problem, a two-dimensional Riemann problem and a two-dimensional underwater explosion case.<br>
+Three types of test cases are available, a one-dimensional Riemann problem and a two-dimensional Riemann problem.<br>
 You can access the test cases using the links below or through the navigation bar on the left.
 
 - [1D Riemann Problem](1D_RIEMANN/post_process_1D_Riemann.ipynb)
+- [2D Riemann Problem](2D_RIEMANN/post_process_2D_Riemann.ipynb)
 
 ### Data reproductibility
 

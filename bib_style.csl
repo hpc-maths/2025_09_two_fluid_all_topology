@@ -544,6 +544,7 @@
         </group>
       </else>
     </choose>
+    <text prefix=". " variable="note"/>
   </macro>
   <macro name="issue">
     <choose>

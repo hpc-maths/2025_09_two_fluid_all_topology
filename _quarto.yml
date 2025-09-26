@@ -8,15 +8,16 @@ website:
     style: "docked"
     header: |
       <div class="sidebar-logo">
-        <img src="/images/logo_HPCatMaths_blanc.png" alt="Logo" height="80">
+        <img src="/images/logo_HPCatMaths_blanc.png" alt="Logo HPCatMaths" height="80">
       </div>
     contents:
       - file: 1D_RIEMANN/post_process_1D_Riemann.ipynb
+      - file: 2D_RIEMANN/post_process_2D_Riemann.ipynb
   page-footer:
     center: |
       <div class="page-logos">
-        <img src="/images/logo_samurai.png" alt="Logo 1" height="60">
-        <img src="/images/logo_IPP.png" alt="Logo 2" height="60">
+        <img src="/images/logo_samurai.png" alt="Logo Samurai" height="60">
+        <img src="/images/logo_IPP.png" alt="Logo IPP" height="60">
       </div>
 
 
