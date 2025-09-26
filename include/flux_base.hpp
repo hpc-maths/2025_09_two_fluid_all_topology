@@ -8,7 +8,7 @@
 
 #include <samurai/schemes/fv.hpp>
 
-#include "auxiliary_structs.hpp"
+#include "utilities.hpp"
 #include "eos.hpp"
 
 namespace samurai {
@@ -20,7 +20,7 @@ namespace samurai {
   public:
     /*--- Definitions and sanity checks ---*/
     static constexpr std::size_t field_size = Field::n_comp;
-    using Indices = EquationData<Field::dim>;
+    using Indices = Utilities::EquationData<Field::dim>;
     static_assert(field_size == Indices::NVARS, "The number of elements in the state does not correpsond to the number of equations");
     static constexpr std::size_t output_field_size = field_size;
     static constexpr std::size_t stencil_size = 2;
