@@ -161,7 +161,7 @@ div.csl-indent {
 <div class="page-authors">
 <p>Authors: <span>Ward Haegeman</span>, <span>Giuseppe Orlando</span>, <span>Samuel Kokh</span>, <span>Marc Massot</span></p>
 </div>
-<p>The goal here is to demonstrate the feasability of numerical simulations of a new <em>all-topology</em> two-fluid model using a standard first-order finite-volume scheme.</p>
+<p>The goal here is to demonstrate the feasability of numerical simulations of a new <em>all-topology</em> two-fluid model <span class="citation" data-cites="haegeman2025">(<a href="#ref-haegeman2025" role="doc-biblioref">Haegeman et al. 2025</a>)</span> using a standard first-order finite-volume scheme.</p>
 <p>Hereafter, we provide the abstract of the contribution in which the model is derived, as well as a link to the full preprint.<br> Next, details on the numerical scheme used and its implementation using the open-source <strong><a href="https://github.com/hpc-maths/samurai/">Samurai library</a></strong> are given before listing the numerical test cases.<br> At the end of this web-page, all the information necessary to install and run the code in order to reproduce the numerical data can be found.</p>
 <section id="abstract" class="level3">
 <h3 class="anchored" data-anchor-id="abstract">Abstract</h3>
@@ -170,7 +170,7 @@ div.csl-indent {
 </section>
 <section id="numerical-method-and-implementation" class="level3">
 <h3 class="anchored" data-anchor-id="numerical-method-and-implementation">Numerical method and implementation</h3>
-<p>The model has been implemented without the contributions related to the lift forces. We refer to the for a complete description of the model. Our implementation corresponds to a finite volume method on structured meshes represented by cartesian grids. On each inter-cell interface, the numerical flux is computed using an approximate Rieman solver. Here, we use the first-order non-conservative Rusanov scheme presented in <span class="citation" data-cites="crouzet2013">(<a href="#ref-crouzet2013" role="doc-biblioref">Crouzet et al. 2013</a>)</span>. Under a standard CFL condition, the scheme is positivity-preserving for the volume fraction and phasic densities.</p>
+<p>The model has been implemented without the contributions related to the lift forces. We refer to <span class="citation" data-cites="haegeman2025">(<a href="#ref-haegeman2025" role="doc-biblioref">Haegeman et al. 2025</a>)</span> for a complete description of the model. Our implementation corresponds to a finite volume method on structured meshes represented by cartesian grids. On each inter-cell interface, the numerical flux is computed using an approximate Rieman solver. Here, we use the first-order non-conservative Rusanov scheme presented in <span class="citation" data-cites="crouzet2013">(<a href="#ref-crouzet2013" role="doc-biblioref">Crouzet et al. 2013</a>)</span>. Under a standard CFL condition, the scheme is positivity-preserving for the volume fraction and phasic densities.</p>
 </section>
 <section id="list-of-test-cases" class="level3">
 <h3 class="anchored" data-anchor-id="list-of-test-cases">List of test cases</h3>
@@ -187,6 +187,9 @@ div.csl-indent {
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-crouzet2013" class="csl-entry" role="listitem">
 Crouzet Fabien, Daude Frédéric, Galon Pascal, Helluy Philippe, Hérard Jean-Marc, Hurisse Olivier, and Liu Yujie. 2013. <span>“Approximate Solutions of the <span>Baer-Nunziato Model</span>.”</span> <em>ESAIM: Proceedings</em> 40 (July). EDP Sciences: 63–82.
+</div>
+<div id="ref-haegeman2025" class="csl-entry" role="listitem">
+Haegeman Ward, Orlando Giuseppe, Kokh Samuel, and Massot Marc. 2025. <span>“An All-Topology Two-Fluid Model for Two-Phase Flows Derived Through <span>Hamilton</span>’s <span>Stationary Action Principle</span>.”</span>
 </div>
 </div>
 
