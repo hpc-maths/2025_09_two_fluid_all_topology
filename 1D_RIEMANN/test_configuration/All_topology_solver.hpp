@@ -27,7 +27,10 @@ template<std::size_t dim>
 class All_Topology_Solver {
 public:
   using Config  = samurai::MRConfig<dim, 2>;
-  using Field   = samurai::VectorField<samurai::MRMesh<Config>, double, EquationData<dim>::NVARS, false>;
+  using Field   = samurai::VectorField<samurai::MRMesh<Config>,
+                                       double,
+                                       Utilities::EquationData<dim>::NVARS,
+                                       false>;
   using Number  = samurai::Flux<Field>::Number;  /*--- Define the shortcut for the arithmetic type ---*/
   using Indices = samurai::Flux<Field>::Indices; /*--- Shortcut for the indices storage ---*/
 
@@ -506,7 +509,7 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   auto NonConservative_flux = numerical_flux_non_cons.make_flux();
 
   /*--- Save the initial condition ---*/
-  const std::string suffix_init = (nfiles != 1) ? "_ite_" + unsigned_to_string(0) : "";
+  const std::string suffix_init = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(0) : "";
   save(path, suffix_init, conserved_variables,
                           rho, p, vel,
                           vel1, rho1, p1, c1, T1, s1, Y1,
@@ -553,7 +556,7 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     // Save the results
     update_auxiliary_fields();
     if(t >= static_cast<Number>(nsave + 1)*dt_save || t == Tf) {
-      const std::string suffix = (nfiles != 1) ? "_ite_" + unsigned_to_string(++nsave) : "";
+      const std::string suffix = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(++nsave) : "";
 
       save(path, suffix, conserved_variables,
                          rho, p, vel,

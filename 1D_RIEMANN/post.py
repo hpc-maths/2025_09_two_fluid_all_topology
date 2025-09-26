@@ -59,10 +59,10 @@ def plot_1D_Riemann_results(filename_base, filename_time, field_name_1, field_na
     sliders = [dict(currentvalue={'prefix': 't = '}, active=i, visible=True, steps=steps)]
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig.add_trace(go.Scatter(x=frames[i].data[0].x, y=frames[i].data[0].y, name=field_name_1), secondary_y=False)
+    fig.add_trace(go.Scatter(x=frames[i].data[0].x, y=frames[i].data[0].y, name=field_name_1,line=dict(color="red")), secondary_y=False)
     if field_name_2 is not None:
-        fig.add_trace(go.Scatter(x=frames[i].data[1].x, y=frames[i].data[1].y, name=field_name_2), secondary_y=True)
-    fig.update_layout(sliders=sliders, height=500)
+        fig.add_trace(go.Scatter(x=frames[i].data[1].x, y=frames[i].data[1].y, name=field_name_2,line=dict(color="blue")), secondary_y=True)
+    fig.update_layout(sliders=sliders, height=500,paper_bgcolor='rgba(0,0,0,0)')
     fig.update(frames=frames)
     fig.update_yaxes(title_text=field_name_1, secondary_y=False)
     if field_name_2 is not None:
