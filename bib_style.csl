@@ -546,6 +546,14 @@
     </choose>
     <text prefix=". " variable="note"/>
   </macro>
+  <macro name="submission-info">
+  <choose>
+    <if variable="Preprint">
+      <text value="Submitted, preperint available on "/>
+        <text variable="Preprint"/>
+    </if>
+  </choose>
+</macro>
   <macro name="issue">
     <choose>
       <if type="legal_case">
@@ -630,6 +638,7 @@
         <text macro="title"/>
       </group>
       <text macro="description"/>
+      <text macro="submission-info"/>
       <text macro="secondary-contributors" prefix=". "/>
       <text macro="container-title" prefix=". "/>
       <text macro="container-contributors"/>
