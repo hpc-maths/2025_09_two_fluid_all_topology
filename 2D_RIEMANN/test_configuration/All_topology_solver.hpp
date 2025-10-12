@@ -369,7 +369,8 @@ void All_Topology_Solver<dim>::apply_bcs() {
 // Compute the estimate of the maximum eigenvalue for CFL condition
 //
 template<std::size_t dim>
-typename All_Topology_Solver<dim>::Number All_Topology_Solver<dim>::get_max_lambda() const {
+typename All_Topology_Solver<dim>::Number
+All_Topology_Solver<dim>::get_max_lambda() const {
   auto local_res = static_cast<Number>(0.0);
 
   samurai::for_each_cell(mesh,

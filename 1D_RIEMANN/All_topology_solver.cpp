@@ -145,7 +145,8 @@ int main(int argc, char* argv[]) {
   CLI11_PARSE(app, argc, argv);
   xt::xtensor_fixed<double, xt::xshape<dim>> min_corner = {sim_param.xL};
   xt::xtensor_fixed<double, xt::xshape<dim>> max_corner = {sim_param.xR};
-  auto All_Topology_Solver_Sim = All_Topology_Solver(min_corner, max_corner, sim_param, eos_param, Riemann_param);
+  auto All_Topology_Solver_Sim = All_Topology_Solver(min_corner, max_corner,
+                                                     sim_param, eos_param, Riemann_param);
 
   All_Topology_Solver_Sim.run(sim_param.nfiles);
 
