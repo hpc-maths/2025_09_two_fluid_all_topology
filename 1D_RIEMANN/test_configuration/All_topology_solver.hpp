@@ -47,8 +47,7 @@ public:
   void run(const std::size_t nfiles = 10); /*--- Function which actually executes the temporal loop ---*/
 
   template<class... Variables>
-  void save(const fs::path& path,
-            const std::string& suffix,
+  void save(const std::string& suffix,
             const Variables&... fields); /*--- Routine to save the results ---*/
 
 private:
@@ -78,6 +77,7 @@ private:
   samurai::NonConservativeFlux<Field> numerical_flux_non_cons; /*--- function to compute the numerical flux for the non-conservative part
                                                                      (this is necessary to call 'make_flux') ---*/
 
+  fs::path    path;     /*--- Auxiliary variable to store the output directory ---*/
   std::string filename; /*--- Auxiliary variable to store the name of output ---*/
 
   Field conserved_variables; /*--- The variable which stores the conserved variables,
@@ -468,8 +468,7 @@ void All_Topology_Solver<dim>::update_auxiliary_fields() {
 //
 template<std::size_t dim>
 template<class... Variables>
-void All_Topology_Solver<dim>::save(const fs::path& path,
-                                    const std::string& suffix,
+void All_Topology_Solver<dim>::save(const std::string& suffix,
                                     const Variables&... fields) {
   auto level_ = samurai::make_scalar_field<std::size_t>("level", mesh);
 
@@ -496,7 +495,7 @@ void All_Topology_Solver<dim>::save(const fs::path& path,
 template<std::size_t dim>
 void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   /*--- Default output arguemnts ---*/
-  fs::path path = fs::current_path();
+  path = fs::current_path();
   filename = "Rusanov_Flux_order1";
 
   const auto dt_save = Tf/static_cast<Number>(nfiles);
@@ -510,11 +509,11 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
 
   /*--- Save the initial condition ---*/
   const std::string suffix_init = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(0) : "";
-  save(path, suffix_init, conserved_variables,
-                          rho, p, vel,
-                          vel1, rho1, p1, c1, T1, s1, Y1,
-                          vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
-                          delta_pres, delta_temp, delta_vel);
+  save(suffix_init, conserved_variables,
+                    rho, p, vel,
+                    vel1, rho1, p1, c1, T1, s1, Y1,
+                    vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
+                    delta_pres, delta_temp, delta_vel);
   time_data.open("time_save.dat", std::ofstream::out);
   time_data << static_cast<Number>(t0) << std::endl;
   time_data.close();
@@ -558,11 +557,11 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     if(t >= static_cast<Number>(nsave + 1)*dt_save || t == Tf) {
       const std::string suffix = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(++nsave) : "";
 
-      save(path, suffix, conserved_variables,
-                         rho, p, vel,
-                         vel1, rho1, p1, c1, T1, s1, Y1,
-                         vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
-                         delta_pres, delta_temp, delta_vel);
+      save(suffix, conserved_variables,
+                   rho, p, vel,
+                   vel1, rho1, p1, c1, T1, s1, Y1,
+                   vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
+                   delta_pres, delta_temp, delta_vel);
 
       /*--- Save the instant of the saving ---*/
       time_data.open("time_save.dat", std::ios_base::app);
