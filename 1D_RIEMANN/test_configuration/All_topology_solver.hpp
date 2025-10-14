@@ -364,12 +364,50 @@ typename All_Topology_Solver<dim>::Number
 All_Topology_Solver<dim>::get_max_lambda() const {
   auto local_res = static_cast<Number>(0.0);
 
+  std::array<Number, dim> vel1_loc;
+  std::array<Number, dim> vel2_loc;
+
   samurai::for_each_cell(mesh,
                          [&](const auto& cell)
                             {
+                              // Pre-fetch varaibles used multiple times in order to exploit (possible) vectorization
+                              // as well as to enhance readability
+                              const auto alpha1_loc = conserved_variables[cell][Indices::ALPHA1_INDEX];
+                              const auto m1_loc     = conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX];
+                              const auto m1E1_loc   = conserved_variables[cell][Indices::ALPHA1_RHO1_E1_INDEX];
+                              const auto m2_loc     = conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX];
+                              const auto m2E2_loc   = conserved_variables[cell][Indices::ALPHA2_RHO2_E2_INDEX];
+
+                              // Compute the fluid velocity and the speed of sound of phase 1
+                              const auto rho1_loc   = m1_loc/alpha1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              const auto inv_m1_loc = static_cast<Number>(1.0)/m1_loc;
+                                                      /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              auto e1_loc           = m1E1_loc*inv_m1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               for(std::size_t d = 0; d < dim; ++d) {
-                                local_res = std::max(std::max(std::abs(vel1[cell][d]) + c1[cell],
-                                                              std::abs(vel2[cell][d]) + c2[cell]),
+                                vel1_loc[d] = conserved_variables[cell][Indices::ALPHA1_RHO1_U1_INDEX + d]*inv_m1_loc;
+                                              /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                e1_loc -= static_cast<Number>(0.5)*(vel1_loc[d]*vel1_loc[d]);
+                              }
+                              const auto p1_loc = EOS_phase1.pres_value_Rhoe(rho1_loc, e1_loc);
+                              const auto c1_loc = EOS_phase1.c_value_RhoP(rho1_loc, p1_loc);
+
+                              // Compute the fluid velocity and the speed of sound of phase 2
+                              const auto alpha2_loc = static_cast<Number>(1.0) - alpha1_loc;
+                              const auto rho2_loc   = m2_loc/alpha2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              const auto inv_m2_loc = static_cast<Number>(1.0)/m2_loc;
+                                                      /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              auto e2_loc           = m2E2_loc*inv_m2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              for(std::size_t d = 0; d < dim; ++d) {
+                                vel2_loc[d] = conserved_variables[cell][Indices::ALPHA2_RHO2_U2_INDEX + d]*inv_m2_loc;
+                                              /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                e2_loc -= static_cast<Number>(0.5)*(vel2_loc[d]*vel2_loc[d]);
+                              }
+                              const auto p2_loc = EOS_phase2.pres_value_Rhoe(rho2_loc, e2_loc);
+                              const auto c2_loc = EOS_phase2.c_value_RhoP(rho2_loc, p2_loc);
+
+                              for(std::size_t d = 0; d < dim; ++d) {
+                                local_res = std::max(std::max(std::abs(vel1_loc[d]) + c1_loc,
+                                                              std::abs(vel2_loc[d]) + c2_loc),
                                                      local_res);
                               }
                             }
@@ -549,13 +587,13 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     }
 
     // Apply the numerical scheme
-    conserved_variables_np1.resize();
     conserved_variables_np1 = conserved_variables - dt*Cons_Flux - dt*NonCons_Flux;
     std::swap(conserved_variables.array(), conserved_variables_np1.array());
 
     // Save the results
-    update_auxiliary_fields();
     if(t >= static_cast<Number>(nsave + 1)*dt_save || t == Tf) {
+      update_auxiliary_fields();
+
       const std::string suffix = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(++nsave) : "";
 
       save(suffix, conserved_variables,

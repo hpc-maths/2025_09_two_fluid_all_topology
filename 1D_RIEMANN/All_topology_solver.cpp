@@ -143,8 +143,16 @@ int main(int argc, char* argv[]) {
 
   /*--- Create the instance of the class to perform the simulation ---*/
   CLI11_PARSE(app, argc, argv);
+  if(sim_param.min_level != sim_param.max_level) {
+    std::cerr << "min-level different that max-level: "
+              << "multi-resolution not supported in current implementation. Check input file."
+              << std::endl;
+    exit(1);
+  }
   xt::xtensor_fixed<double, xt::xshape<dim>> min_corner = {sim_param.xL};
   xt::xtensor_fixed<double, xt::xshape<dim>> max_corner = {sim_param.xR};
+  std::cout << sim_param.min_level << std::endl;
+  std::cout << sim_param.min_level << std::endl;
   auto All_Topology_Solver_Sim = All_Topology_Solver(min_corner, max_corner,
                                                      sim_param, eos_param, Riemann_param);
 
