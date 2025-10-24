@@ -582,7 +582,6 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   auto t            = static_cast<Number>(t0);
   while(t != Tf) {
     // Compute time step
-    samurai::update_ghost_mr(conserved_variables);
     auto Cons_Flux    = Rusanov_flux(conserved_variables);
     auto NonCons_Flux = NonConservative_flux(conserved_variables);
     dt = std::min(Tf - t, cfl*dx/get_max_lambda());
@@ -594,7 +593,7 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
 
     // Apply the numerical scheme
     conserved_variables_np1 = conserved_variables - dt*Cons_Flux - dt*NonCons_Flux;
-    std::swap(conserved_variables.array(), conserved_variables_np1.array());
+    samurai::swap(conserved_variable, conserved_variables_np1);
 
     // Save the results
     if(t >= static_cast<Number>(nsave + 1)*dt_save || t == Tf) {
