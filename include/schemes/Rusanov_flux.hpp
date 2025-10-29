@@ -24,7 +24,8 @@ namespace samurai {
                 const EOS<Number>& EOS_phase2_); /*--- Constructor which accepts in input
                                                        the equations of state of the two phases ---*/
 
-    auto make_flux(); /*--- Compute the flux over all the faces and directions ---*/
+    virtual decltype(make_flux_based_scheme(std::declval<FluxDefinition<cfg>>())) make_flux() override;
+    /*--- Compute the flux over all the faces and directions ---*/
 
   private:
     FluxValue<cfg> compute_discrete_flux(const FluxValue<cfg>& qL,
@@ -129,8 +130,9 @@ namespace samurai {
   // Implement the contribution of the discrete flux for all the dimensions.
   //
   template<class Field>
-  auto RusanovFlux<Field>::make_flux() {
-    FluxDefinition<cfg> discrete_flux;
+  decltype(make_flux_based_scheme(std::declval<FluxDefinition<typename RusanovFlux<Field>::cfg>>()))
+  RusanovFlux<Field>::make_flux() {
+    FluxDefinition<cfg> Rusanov_flux;
 
     /*--- Perform the loop over each dimension to compute the flux contribution ---*/
     static_for<0, Field::dim>::apply(
@@ -138,22 +140,22 @@ namespace samurai {
          {
            static constexpr int d = decltype(integral_constant_d)::value;
 
-           // Compute now the "discrete" flux function
-           discrete_flux[d].cons_flux_function = [&](FluxValue<cfg>& flux,
-                                                     const StencilData<cfg>& /*data*/,
-                                                     const StencilValues<cfg> field)
-                                                     {
-                                                       // Extract the states
-                                                       const FluxValue<cfg> qL = field[0];
-                                                       const FluxValue<cfg> qR = field[1];
+           // Compute now the "discrete" flux function, in this case a HLL flux
+           Rusanov_flux[d].cons_flux_function = [&](FluxValue<cfg>& flux,
+                                                    const StencilData<cfg>& /*data*/,
+                                                    const StencilValues<cfg> field)
+                                                    {
+                                                      // Extract the states
+                                                      const FluxValue<cfg> qL = field[0];
+                                                      const FluxValue<cfg> qR = field[1];
 
-                                                       flux = compute_discrete_flux(qL, qR, d);
-                                                     };
+                                                      flux = compute_discrete_flux(qL, qR, d);
+                                                    };
         }
     );
 
-    auto scheme = make_flux_based_scheme(discrete_flux);
-    scheme.set_name("Rusanov");
+    auto scheme = make_flux_based_scheme(Rusanov_flux);
+    scheme.set_name(this->get_flux_name());
 
     return scheme;
   }

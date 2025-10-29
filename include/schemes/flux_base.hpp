@@ -8,8 +8,8 @@
 
 #include <samurai/schemes/fv.hpp>
 
-#include "utilities.hpp"
-#include "eos.hpp"
+#include "../utilities.hpp"
+#include "../eos.hpp"
 
 namespace samurai {
   /**
@@ -31,6 +31,15 @@ namespace samurai {
          const EOS<Number>& EOS_phase2_); /*--- Constructor which accepts in input
                                                 the equations of state of the two phases ---*/
 
+    virtual ~Flux() {} /*--- Virtual destructor (because pure virtual class) ---*/
+
+    inline void set_flux_name(const std::string& flux_name_); /*--- Set the name of the numerical flux ---*/
+
+    inline std::string get_flux_name() const; /*--- Get the name of the numerical flux ---*/
+
+    virtual decltype(make_flux_based_scheme(std::declval<FluxDefinition<cfg>>())) make_flux() = 0;
+    /*--- Compute the flux over all the faces and directions ---*/
+
   protected:
     const EOS<Number>& EOS_phase1; /*--- Pass it by reference because pure virtual (not so nice, maybe moving to pointers) ---*/
     const EOS<Number>& EOS_phase2; /*--- Pass it by reference because pure virtual (not so nice, maybe moving to pointers) ---*/
@@ -38,6 +47,9 @@ namespace samurai {
     FluxValue<cfg> evaluate_continuous_flux(const FluxValue<cfg>& q,
                                             const std::size_t curr_d); /*--- Evaluate the 'continuous' flux for the state q
                                                                              along direction curr_d ---*/
+
+  private:
+    std::string flux_name; /*--- Name of the numerical flux ---*/
   };
 
   // Class constructor in order to be able to work with the equation of state
@@ -46,6 +58,20 @@ namespace samurai {
   Flux<Field>::Flux(const EOS<Number>& EOS_phase1_,
                     const EOS<Number>& EOS_phase2_):
     EOS_phase1(EOS_phase1_), EOS_phase2(EOS_phase2_) {}
+
+  // Set the name of the numerical flux
+  //
+  template<class Field>
+  inline void Flux<Field>::set_flux_name(const std::string& flux_name_) {
+    flux_name = flux_name_;
+  }
+
+  // Get the name of the numerical flux
+  //
+  template<class Field>
+  inline std::string Flux<Field>::get_flux_name() const {
+    return flux_name;
+  }
 
   // Evaluate the 'continuous flux' along direction 'curr_d'
   //

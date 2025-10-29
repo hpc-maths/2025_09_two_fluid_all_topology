@@ -21,8 +21,8 @@ namespace fs = std::filesystem;
 #include "user_bc.hpp"
 
 /*--- Include the headers with the numerical fluxes ---*/
-#include "Rusanov_flux.hpp"
-#include "non_conservative_flux.hpp"
+#include "schemes/Rusanov_flux.hpp"
+#include "schemes/non_conservative_flux.hpp"
 
 // This is the class for the simulation of the all-topology model
 //
@@ -71,11 +71,11 @@ private:
   const SG_EOS<Number> EOS_phase1; /*--- Equation of state of phase 1 ---*/
   const SG_EOS<Number> EOS_phase2; /*--- Equation of state of phase 2 ---*/
 
-  samurai::RusanovFlux<Field> numerical_flux_cons; /*--- function to compute the numerical flux for the conservative part
-                                                         (this is necessary to call 'make_flux') ---*/
+  std::unique_ptr<samurai::Flux<Field>> numerical_flux_cons; /*--- function to compute the numerical flux for the conservative part
+                                                                   (this is necessary to call 'make_flux') ---*/
 
-  samurai::NonConservativeFlux<Field> numerical_flux_non_cons; /*--- function to compute the numerical flux for the non-conservative part
-                                                                     (this is necessary to call 'make_flux') ---*/
+  std::unique_ptr<samurai::Flux<Field>> numerical_flux_non_cons; /*--- function to compute the numerical flux for the non-conservative part
+                                                                       (this is necessary to call 'make_flux') ---*/
 
   fs::path    path;     /*--- Auxiliary variable to store the output directory ---*/
   std::string filename; /*--- Auxiliary variable to store the name of output ---*/
@@ -137,9 +137,7 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
   t0(sim_param.t0), Tf(sim_param.Tf),
   cfl(sim_param.Courant),
   EOS_phase1(eos_param.gamma_1, eos_param.pi_infty_1, eos_param.q_infty_1, eos_param.c_v_1),
-  EOS_phase2(eos_param.gamma_2, eos_param.pi_infty_2, eos_param.q_infty_2, eos_param.c_v_2),
-  numerical_flux_cons(EOS_phase1, EOS_phase2),
-  numerical_flux_non_cons(EOS_phase1, EOS_phase2)
+  EOS_phase2(eos_param.gamma_2, eos_param.pi_infty_2, eos_param.q_infty_2, eos_param.c_v_2)
   {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -157,6 +155,13 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
 
     /*--- Apply boundary conditions ---*/
     apply_bcs();
+
+    /*--- Initiliaze the numerical fluxes ---*/
+    numerical_flux_cons = std::make_unique<samurai::RusanovFlux<Field>>(EOS_phase1, EOS_phase2);
+    numerical_flux_cons->set_flux_name("Rusanov");
+
+    numerical_flux_non_cons = std::make_unique<samurai::NonConservativeFlux<Field>>(EOS_phase1, EOS_phase2);
+    numerical_flux_non_cons->set_flux_name("Non Conservative");
   }
 
 // Auxiliary routine to create the fields
@@ -552,8 +557,8 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   auto conserved_variables_np1 = samurai::make_vector_field<Number, Field::n_comp>("conserved_np1", mesh);
 
   /*--- Create the flux variables ---*/
-  auto Rusanov_flux         = numerical_flux_cons.make_flux();
-  auto NonConservative_flux = numerical_flux_non_cons.make_flux();
+  auto Rusanov_flux         = numerical_flux_cons->make_flux();
+  auto NonConservative_flux = numerical_flux_non_cons->make_flux();
 
   /*--- Save the initial condition ---*/
   const std::string suffix_init = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(0) : "";
@@ -582,8 +587,6 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   auto t            = static_cast<Number>(t0);
   while(t != Tf) {
     // Compute time step
-    auto Cons_Flux    = Rusanov_flux(conserved_variables);
-    auto NonCons_Flux = NonConservative_flux(conserved_variables);
     dt = std::min(Tf - t, cfl*dx/get_max_lambda());
     t += dt;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -592,8 +595,10 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     }
 
     // Apply the numerical scheme
-    conserved_variables_np1 = conserved_variables - dt*Cons_Flux - dt*NonCons_Flux;
-    samurai::swap(conserved_variable, conserved_variables_np1);
+    conserved_variables_np1 = conserved_variables
+                            - dt*Rusanov_flux(conserved_variables)
+                            - dt*NonConservative_flux(conserved_variables);
+    samurai::swap(conserved_variables, conserved_variables_np1);
 
     // Save the results
     if(t >= static_cast<Number>(nsave + 1)*dt_save || t == Tf) {

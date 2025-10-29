@@ -22,7 +22,8 @@ namespace samurai {
                         const EOS<Number>& EOS_phase2_); /*--- Constructor which accepts in input
                                                                the equations of state of the two phases ---*/
 
-    auto make_flux(); /*--- Compute the flux over all the faces and directions ---*/
+    virtual decltype(make_flux_based_scheme(std::declval<FluxDefinition<cfg>>())) make_flux() override;
+    /*--- Compute the flux over all the faces and directions ---*/
 
   private:
     void compute_discrete_flux(const FluxValue<cfg>& qL,
@@ -139,25 +140,25 @@ namespace samurai {
 
     /*--- Build the non conservative flux ---*/
     F_minus(Indices::ALPHA1_INDEX) = velI_L*
-                            (static_cast<Number>(0.5)*
-                             (alpha1_L + alpha1_R));
+                                     (static_cast<Number>(0.5)*
+                                      (alpha1_L + alpha1_R));
     F_plus(Indices::ALPHA1_INDEX)  = velI_R*
-                            (static_cast<Number>(0.5)*
-                             (alpha1_L + alpha1_R));
+                                     (static_cast<Number>(0.5)*
+                                      (alpha1_L + alpha1_R));
 
     F_minus(Indices::ALPHA1_RHO1_U1_INDEX + curr_d) = -pI_L*
-                                              (static_cast<Number>(0.5)*
-                                              (alpha1_L + alpha1_R));
+                                                       (static_cast<Number>(0.5)*
+                                                        (alpha1_L + alpha1_R));
     F_plus(Indices::ALPHA1_RHO1_U1_INDEX + curr_d)  = -pI_R*
-                                              (static_cast<Number>(0.5)*
-                                              (alpha1_L + alpha1_R));
+                                                       (static_cast<Number>(0.5)*
+                                                        (alpha1_L + alpha1_R));
 
     F_minus(Indices::ALPHA1_RHO1_E1_INDEX) = -puI_L*
-                                     (static_cast<Number>(0.5)*
-                                     (alpha1_L + alpha1_R));
+                                              (static_cast<Number>(0.5)*
+                                               (alpha1_L + alpha1_R));
     F_plus(Indices::ALPHA1_RHO1_E1_INDEX)  = -puI_R*
-                                     (static_cast<Number>(0.5)*
-                                     (alpha1_L + alpha1_R));
+                                              (static_cast<Number>(0.5)*
+                                               (alpha1_L + alpha1_R));
 
     F_minus(Indices::ALPHA2_RHO2_U2_INDEX + curr_d) = -F_minus(Indices::ALPHA1_RHO1_U1_INDEX + curr_d);
     F_plus(Indices::ALPHA2_RHO2_U2_INDEX + curr_d)  = -F_plus(Indices::ALPHA1_RHO1_U1_INDEX + curr_d);
@@ -169,8 +170,9 @@ namespace samurai {
   // Implement the contribution of the discrete flux for all the dimensions.
   //
   template<class Field>
-  auto NonConservativeFlux<Field>::make_flux() {
-    FluxDefinition<cfg> discrete_flux;
+  decltype(make_flux_based_scheme(std::declval<FluxDefinition<typename NonConservativeFlux<Field>::cfg>>()))
+  NonConservativeFlux<Field>::make_flux() {
+    FluxDefinition<cfg> non_conservative_flux;
 
     /*--- Perform the loop over each dimension to compute the flux contribution ---*/
     static_for<0, Field::dim>::apply(
@@ -179,27 +181,27 @@ namespace samurai {
            static constexpr int d = decltype(integral_constant_d)::value;
 
            // Compute now the "discrete" non-conservative flux function
-           discrete_flux[d].flux_function = [&](FluxValuePair<cfg>& flux,
-                                                const StencilData<cfg>& /*data*/,
-                                                const StencilValues<cfg> field)
-                                                {
-                                                  // Extract the states
-                                                  const FluxValue<cfg>& qL = field[0];
-                                                  const FluxValue<cfg>& qR = field[1];
+           non_conservative_flux[d].flux_function = [&](FluxValuePair<cfg>& flux,
+                                                        const StencilData<cfg>& /*data*/,
+                                                        const StencilValues<cfg> field)
+                                                        {
+                                                          // Extract the states
+                                                          const FluxValue<cfg>& qL = field[0];
+                                                          const FluxValue<cfg>& qR = field[1];
 
-                                                  FluxValue<cfg> F_minus,
-                                                                 F_plus;
+                                                          FluxValue<cfg> F_minus,
+                                                                         F_plus;
 
-                                                  compute_discrete_flux(qL, qR, d, F_minus, F_plus);
+                                                          compute_discrete_flux(qL, qR, d, F_minus, F_plus);
 
-                                                  flux[0] = F_minus;
-                                                  flux[1] = -F_plus;
-                                                };
+                                                          flux[0] = F_minus;
+                                                          flux[1] = -F_plus;
+                                                        };
         }
     );
 
-    auto scheme = make_flux_based_scheme(discrete_flux);
-    scheme.set_name("Non conservative");
+    auto scheme = make_flux_based_scheme(non_conservative_flux);
+    scheme.set_name(this->get_flux_name());
 
     return scheme;
   }
