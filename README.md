@@ -2,7 +2,13 @@ This repository contains a numerical solver for the novel model presented in ``A
 The implementation is carried out in the framework of [samurai](https://github.com/hpc-maths/samurai).
 The spatial discretization is based on the finite volume method using a non-conservative Rusanov flux.
 
-In order to build the executable, please first install ```samurai``` folliwing the instructions at https://github.com/hpc-maths/samurai. Then, move into the directory with the test case of interest and run
+In order to build the executable, please first install ```samurai``` folliwing the instructions at https://github.com/hpc-maths/samurai. Please, include ```nlohmann```in your environment
+
+```bash
+mamba install nlohmann_json
+```
+
+Then, move into the directory with the test case of interest and run
 
 ```bash
 source configure.sh
