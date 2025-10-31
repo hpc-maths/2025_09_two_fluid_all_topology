@@ -60,12 +60,10 @@ struct Riemann_Parameters {
   T p1L;
   T T1L;
   T u1L;
-  T v1L;
   T rho2L;
   T p2L;
   T T2L;
   T u2L;
-  T v2L;
 
   /*--- Right state ---*/
   T alpha1R;
@@ -73,10 +71,8 @@ struct Riemann_Parameters {
   T p1R;
   T T1R;
   T u1R;
-  T v1R;
   T rho2R;
   T p2R;
   T T2R;
   T u2R;
-  T v2R;
 };

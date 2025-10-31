@@ -6,6 +6,8 @@
 //
 #pragma once
 
+#include "flux_base.hpp"
+
 namespace samurai {
   /**
     * Implementation of the non-conservative flux

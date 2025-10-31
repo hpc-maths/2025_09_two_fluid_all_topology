@@ -24,6 +24,9 @@ namespace fs = std::filesystem;
 #include "schemes/Rusanov_flux.hpp"
 #include "schemes/non_conservative_flux.hpp"
 
+/*--- Define preprocessor to check whether to control data or not ---*/
+#define VERBOSE
+
 // This is the class for the simulation of the all-topology model
 //
 template<std::size_t dim>
@@ -117,6 +120,8 @@ private:
   void apply_bcs(); /*--- Auxiliary routine for the boundary conditions ---*/
 
   Number get_max_lambda() const; /*--- Compute the estimate of the maximum eigenvalue ---*/
+
+  void check_data(); /*--- Auxiliary routine to check if (small) spurious negative values are present ---*/
 
   void update_auxiliary_fields(); /*--- Routine to update auxiliary fields for output and time step update ---*/
 };
@@ -433,6 +438,57 @@ All_Topology_Solver<dim>::get_max_lambda() const {
   return global_res;
 }
 
+// Auxiliary routine to check if spurious negative values arise
+//
+template<std::size_t dim>
+void All_Topology_Solver<dim>::check_data() {
+  samurai::for_each_cell(mesh,
+                         [&](const auto& cell)
+                            {
+                              // Start with the volume fraction
+                              if(conserved_variables[cell][Indices::ALPHA1_INDEX] < static_cast<Number>(0.0)) {
+                                std::cerr << "Negative volume fraction for phase 1" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+                              else if(conserved_variables[cell][Indices::ALPHA1_INDEX] > static_cast<Number>(1.0)) {
+                                std::cerr << "Exceeding volume fraction for phase 1" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+                              else if(std::isnan(conserved_variables[cell][Indices::ALPHA1_INDEX])) {
+                                std::cerr << "NaN volume fraction for phase 1" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+
+                              // Sanity check for m1
+                              if(conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX] < static_cast<Number>(0.0)) {
+                                std::cerr << "Negative mass for phase 1" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+                              else if(std::isnan(conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX])) {
+                                std::cerr << "NaN mass for phase 1" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+
+                              // Sanity check for m2
+                              if(conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX] < static_cast<Number>(0.0)) {
+                                std::cerr << "Negative mass for phase 2" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+                              else if(std::isnan(conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX])){
+                                std::cerr << "NaN mass for phase 2" << std::endl;
+                                save("_diverged", conserved_variables);
+                                exit(1);
+                              }
+                            }
+                        );
+}
+
 // Update auxiliary fields after solution of the system
 //
 template<std::size_t dim>
@@ -595,10 +651,20 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     }
 
     // Apply the numerical scheme
-    conserved_variables_np1 = conserved_variables
-                            - dt*Rusanov_flux(conserved_variables)
-                            - dt*NonConservative_flux(conserved_variables);
+    try {
+      conserved_variables_np1 = conserved_variables
+                              - dt*Rusanov_flux(conserved_variables)
+                              - dt*NonConservative_flux(conserved_variables);
+    }
+    catch(const std::exception& e) {
+      std::cerr << e.what() << std::endl;
+      save("_diverged", conserved_variables);
+      exit(1);
+    }
     samurai::swap(conserved_variables, conserved_variables_np1);
+    #ifdef VERBOSE
+      check_data();
+    #endif
 
     // Save the results
     if(t >= static_cast<Number>(nsave + 1)*dt_save || t == Tf) {
