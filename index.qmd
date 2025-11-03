@@ -16,7 +16,7 @@ reference-location: document
 The goal here is to demonstrate the feasability of numerical simulations of a new *all-topology* two-fluid model [@haegeman2025] using a standard first-order finite-volume scheme.
 
 Hereafter, we provide the abstract of the contribution in which the model is derived, as well as a link to the full preprint.<br>
-Next, details on the numerical scheme used and its implementation using the open-source **[Samurai library](https://github.com/hpc-maths/samurai/)** are given before listing the numerical test cases.<br>
+Next, details on the numerical scheme used and its implementation using the open-source **[samurai library](https://github.com/hpc-maths/samurai/)** are given before listing the numerical test cases.<br>
 At the end of this web-page, all the information necessary to install and run the code in order to reproduce the numerical data can be found.
 
 
@@ -44,7 +44,7 @@ You can access the test cases using the links below or through the navigation ba
 This code is based on the open-source **[samurai](https://github.com/hpc-maths/samurai/)** library, which needs to be installed.
 Please, find the source codes and post-processing scripts used to generate the data at <br>
 <https://github.com/hpc-maths/2025_09_two_fluid_all_topology> <br>
-All the instructions on how to generate the data are provided in README.md. 
+All the instructions on how to generate the data are provided in README.md.
 
 ### References
 
