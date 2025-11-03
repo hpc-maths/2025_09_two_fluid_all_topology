@@ -41,9 +41,10 @@ You can access the test cases using the links below or through the navigation ba
 
 ### Data reproducibility
 
+This code is based on the open-source **[samurai](https://github.com/hpc-maths/samurai/)** library, which needs to be installed.
 Please, find the source codes and post-processing scripts used to generate the data at <br>
 <https://github.com/hpc-maths/2025_09_two_fluid_all_topology> <br>
-We refer to **[Samurai](https://github.com/hpc-maths/samurai/)** for the installation of the library.
+All the instructions on how to generate the data are provided in README.md. 
 
 ### References
 
