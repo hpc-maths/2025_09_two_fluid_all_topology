@@ -715,7 +715,7 @@ void All_Topology_Solver<dim>::save(const std::string& suffix,
 template<std::size_t dim>
 void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   /*--- Default output arguemnts ---*/
-  path = fs::current_path();
+  path = "RESULTS";
   filename = "Rusanov_Flux_order1";
 
   const auto dt_save = Tf/static_cast<Number>(nfiles);

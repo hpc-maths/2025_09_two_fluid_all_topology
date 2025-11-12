@@ -65,10 +65,10 @@ print("Done generating images")
 print("Running ffmpeg to create video...")
 ffmpeg_cmd = [
     "ffmpeg",
-    "-y",                    
-    "-framerate", "5",      
+    "-y",
+    "-framerate", "5",
     "-i", "export_%04d.png",
-    "-c:v", "libx264",
+    "-c:v", "libopenh264",
     "-pix_fmt", "yuv420p",
     "2D_Riemann_p2.mp4"
 ]

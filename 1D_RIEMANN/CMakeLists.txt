@@ -13,5 +13,7 @@ find_package(MPI)
 set(CMAKE_CXX_STANDARD 23)
 
 add_executable(All_topology_test All_topology_solver.cpp)
+set_target_properties(All_topology_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 target_link_libraries(All_topology_test samurai::samurai CLI11::CLI11 nlohmann_json::nlohmann_json)
 target_include_directories(All_topology_test PRIVATE ../include)
