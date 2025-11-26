@@ -32,7 +32,7 @@ namespace fs = std::filesystem;
 template<std::size_t dim>
 class All_Topology_Solver {
 public:
-  using Config  = samurai::MRConfig<dim, 2>;
+  using Config  = samurai::MRConfig<dim>;
   using Field   = samurai::VectorField<samurai::MRMesh<Config>,
                                        double,
                                        Utilities::EquationData<dim>::NVARS,
@@ -432,10 +432,11 @@ All_Topology_Solver<dim>::get_max_lambda() const {
                             }
                         );
 
+  const double local_res_d = static_cast<double>(local_res);
   double global_res;
-  MPI_Allreduce(&local_res, &global_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  MPI_Allreduce(&local_res_d, &global_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
-  return global_res;
+  return static_cast<Number>(global_res);
 }
 
 // Auxiliary routine to check if spurious negative values arise

@@ -199,7 +199,7 @@ T SG_EOS<T>::c_value_RhoP(const T rho, const T pres) const {
 //
 template<typename T>
 T SG_EOS<T>::s_value_Rhoe(const T rho, const T e) const {
-  const T v = 1.0/rho;
+  const T v = static_cast<T>(1.0)/rho;
 
   return c_v*std::log(std::pow(v,gamma - static_cast<T>(1.0))*(e - q_infty - pi_infty*v));
 }

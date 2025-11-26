@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
 template<std::size_t dim>
 class All_Topology_Solver {
 public:
-  using Config  = samurai::MRConfig<dim, 2>;
+  using Config  = samurai::MRConfig<dim>;
   using Field   = samurai::VectorField<samurai::MRMesh<Config>,
                                        double,
                                        Utilities::EquationData<dim>::NVARS,
@@ -423,10 +423,11 @@ All_Topology_Solver<dim>::get_max_lambda() const {
                             }
                         );
 
+  const double local_res_d = static_cast<double>(local_res);
   double global_res;
-  MPI_Allreduce(&local_res, &global_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  MPI_Allreduce(&local_res_d, &global_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
-  return global_res;
+  return static_cast<Number>(global_res);
 }
 
 // Auxiliary routine to check if spurious negative values arise
@@ -790,12 +791,12 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
                    delta_pres, delta_temp, delta_vel);
 
       /*--- Save the instant of the saving ---*/
-      time_data.open("time_save.dat", std::ios_base::app);
+      time_data.open(path.string() + "/time_save.dat", std::ios_base::app);
       time_data << t << std::endl;
       time_data.close();
 
       /*--- Save fields in a output file ---*/
-      output_data.open("output_data.dat", std::ofstream::out);
+      output_data.open(path.string() + "/output_data.dat", std::ofstream::out);
       samurai::for_each_cell(mesh,
                              [&](const auto& cell)
                              {

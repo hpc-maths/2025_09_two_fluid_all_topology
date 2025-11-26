@@ -26,15 +26,15 @@ int main(int argc, char* argv[]) {
   Simulation_Parameters<Number> sim_param;
 
   // Physical parameters
-  sim_param.xL = input.value("xL", 0.0);
-  sim_param.xR = input.value("xR", 1.0);
+  sim_param.xL = input.value("xL", static_cast<double>(0.0));
+  sim_param.xR = input.value("xR", static_cast<double>(1.0));
 
-  sim_param.t0 = input.value("t0", 0.0);
-  sim_param.Tf = input.value("Tf", 0.007);
+  sim_param.t0 = input.value("t0", static_cast<Number>(0.0));
+  sim_param.Tf = input.value("Tf", static_cast<Number>(0.007));
 
   // Numerical parameters
-  sim_param.Courant = input.value("cfl", 0.2);
-  sim_param.dt      = input.value("dt", 1e-8);
+  sim_param.Courant = input.value("cfl", static_cast<Number>(0.2));
+  sim_param.dt      = input.value("dt", static_cast<Number>(1e-8));
 
   // Mesh parameters
   sim_param.min_level = input.value("min-level", static_cast<std::size_t>(10));
@@ -65,15 +65,15 @@ int main(int argc, char* argv[]) {
   /*--- Set and declare simulation parameters related to EOS ---*/
   EOS_Parameters<Number> eos_param;
 
-  eos_param.gamma_1    = input.value("gamma_1", 3.0);
-  eos_param.pi_infty_1 = input.value("pi_infty_1", 1e2);
-  eos_param.q_infty_1  = input.value("q_infty_1", 0.0);
-  eos_param.c_v_1      = input.value("c_v_1", 1.040e3);
+  eos_param.gamma_1    = input.value("gamma_1", static_cast<Number>(3.0));
+  eos_param.pi_infty_1 = input.value("pi_infty_1", static_cast<Number>(1e2));
+  eos_param.q_infty_1  = input.value("q_infty_1", static_cast<Number>(0.0));
+  eos_param.c_v_1      = input.value("c_v_1", static_cast<Number>(1.040e3));
 
-  eos_param.gamma_2    = input.value("gamma_2", 1.4);
-  eos_param.pi_infty_2 = input.value("pi_infty_2", 0.0);
-  eos_param.q_infty_2  = input.value("q_infty_2", 0.0);
-  eos_param.c_v_2      = input.value("c_v_2", 1.040e3);
+  eos_param.gamma_2    = input.value("gamma_2", static_cast<Number>(1.4));
+  eos_param.pi_infty_2 = input.value("pi_infty_2", static_cast<Number>(0.0));
+  eos_param.q_infty_2  = input.value("q_infty_2", static_cast<Number>(0.0));
+  eos_param.c_v_2      = input.value("c_v_2", static_cast<Number>(1.040e3));
 
   /*--- Allow for parsing from command line ---*/
   app.add_option("--gammma_1", eos_param.gamma_1, "gamma_1")->capture_default_str()->group("EOS parameters");
@@ -89,29 +89,29 @@ int main(int argc, char* argv[]) {
   /*--- Set and declare simulation parameters related to initial condition ---*/
   Riemann_Parameters<Number> Riemann_param;
 
-  Riemann_param.xd      = input.value("xd", 0.8);
+  Riemann_param.xd      = input.value("xd", static_cast<Number>(0.8));
 
-  Riemann_param.alpha1L = input.value("alpha1L", 0.8);
-  Riemann_param.rho1L   = input.value("rho1L", 1.0);
-  Riemann_param.p1L     = input.value("p1L", 1e3);
-  Riemann_param.T1L     = input.value("T1L", 363.0);
-  Riemann_param.u1L     = input.value("u1L", -19.59716);
+  Riemann_param.alpha1L = input.value("alpha1L", static_cast<Number>(0.8));
+  Riemann_param.rho1L   = input.value("rho1L", static_cast<Number>(1.0));
+  Riemann_param.p1L     = input.value("p1L", static_cast<Number>(1e3));
+  Riemann_param.T1L     = input.value("T1L", static_cast<Number>(363.0));
+  Riemann_param.u1L     = input.value("u1L", static_cast<Number>(-19.59716));
 
-  Riemann_param.rho2L   = input.value("rho2L", 1.0);
-  Riemann_param.p2L     = input.value("p2L", 1e3);
-  Riemann_param.T2L     = input.value("T2L", 1000.0);
-  Riemann_param.u2L     = input.value("u2L", -19.59741);
+  Riemann_param.rho2L   = input.value("rho2L", static_cast<Number>(1.0));
+  Riemann_param.p2L     = input.value("p2L", static_cast<Number>(1e3));
+  Riemann_param.T2L     = input.value("T2L", static_cast<Number>(1000.0));
+  Riemann_param.u2L     = input.value("u2L", static_cast<Number>(-19.59741));
 
-  Riemann_param.alpha1R = input.value("alpha1R", 0.3);
-  Riemann_param.rho1R   = input.value("rho1R", 1.0);
-  Riemann_param.p1R     = input.value("p1R", 1e-1);
-  Riemann_param.T1R     = input.value("T1R", 363.0);
-  Riemann_param.u1R     = input.value("u1R", -19.59741);
+  Riemann_param.alpha1R = input.value("alpha1R", static_cast<Number>(0.3));
+  Riemann_param.rho1R   = input.value("rho1R", static_cast<Number>(1.0));
+  Riemann_param.p1R     = input.value("p1R", static_cast<Number>(1e-1));
+  Riemann_param.T1R     = input.value("T1R", static_cast<Number>(363.0));
+  Riemann_param.u1R     = input.value("u1R", static_cast<Number>(-19.59741));
 
-  Riemann_param.rho2R   = input.value("rho2R", 1.0);
-  Riemann_param.p2R     = input.value("p2R", 1e-1);
-  Riemann_param.T2R     = input.value("T2R", 1000.0);
-  Riemann_param.u2R     = input.value("u2R", -19.59741);
+  Riemann_param.rho2R   = input.value("rho2R", static_cast<Number>(1.0));
+  Riemann_param.p2R     = input.value("p2R", static_cast<Number>(1e-1));
+  Riemann_param.T2R     = input.value("T2R", static_cast<Number>(1000.0));
+  Riemann_param.u2R     = input.value("u2R", static_cast<Number>(-19.59741));
 
   app.add_option("--xd", Riemann_param.xd, "Initial discontinuity location")->capture_default_str()->group("Initial conditions");
 
