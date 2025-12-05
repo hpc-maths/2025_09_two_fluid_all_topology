@@ -18,7 +18,7 @@ We provide a conda environment file (```conda/environment_samurai.yml```) to fac
 
 ```bash
 conda env create -f conda/environment_samurai.yml
-conda activate samurai-0-27
+conda activate samurai-0.27
 ```
 
 Then, move into the directory with the test case of interest and run

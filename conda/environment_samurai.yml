@@ -8,9 +8,10 @@ dependencies:
   - cxx-compiler
   - samurai>=0.27
   - matplotlib
-  - libboost-mpi
+  - libboost-mpi < 1.87
   - libboost-devel
   - libboost-headers
   - 'hdf5=*=mpi*'
   - ffmpeg
   - nlohmann_json
+  - mpich
