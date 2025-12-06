@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
   app.add_option("--max-level", sim_param.max_level, "Maximum level of the AMR")->capture_default_str()->group("Mesh parameter");
 
   // Output parameters
-  app.add_option("--nfiles", sim_param.nfiles, "Number of output files")->capture_default_str()->group("Ouput parameters");
+  app.add_option("--nfiles", sim_param.nfiles, "Number of output files")->capture_default_str()->group("Output parameters");
 
   /*--- Set and declare simulation parameters related to EOS ---*/
   EOS_Parameters<Number> eos_param;
