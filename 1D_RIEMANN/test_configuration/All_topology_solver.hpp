@@ -142,7 +142,8 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
   t0(sim_param.t0), Tf(sim_param.Tf),
   cfl(sim_param.Courant),
   EOS_phase1(eos_param.gamma_1, eos_param.pi_infty_1, eos_param.q_infty_1, eos_param.c_v_1),
-  EOS_phase2(eos_param.gamma_2, eos_param.pi_infty_2, eos_param.q_infty_2, eos_param.c_v_2)
+  EOS_phase2(eos_param.gamma_2, eos_param.pi_infty_2, eos_param.q_infty_2, eos_param.c_v_2),
+  path(sim_param.save_dir)
   {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -707,7 +708,6 @@ void All_Topology_Solver<dim>::save(const std::string& suffix,
 template<std::size_t dim>
 void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   /*--- Default output arguemnts ---*/
-  path = "RESULTS";
   filename = "Rusanov_Flux_order1";
 
   const auto dt_save = Tf/static_cast<Number>(nfiles);

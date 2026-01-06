@@ -29,6 +29,7 @@ struct Simulation_Parameters {
   std::size_t max_level;
 
   /*--- Output parameters ---*/
+  std::string save_dir;
   std::size_t nfiles;
 };
 

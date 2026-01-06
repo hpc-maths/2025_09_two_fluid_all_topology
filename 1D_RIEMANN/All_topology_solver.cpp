@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
   sim_param.max_level = input.value("max-level", static_cast<std::size_t>(10));
 
   // Output parameters
-  sim_param.nfiles = input.value("nfiles", static_cast<std::size_t>(10));
+  sim_param.save_dir = input.value("save-dir", "RESULTS");
+  sim_param.nfiles   = input.value("nfiles", static_cast<std::size_t>(10));
 
   /*--- Allow for parsing from command line ---*/
   // Physical parameters
@@ -60,6 +61,7 @@ int main(int argc, char* argv[]) {
   app.add_option("--max-level", sim_param.max_level, "Maximum level of the AMR")->capture_default_str()->group("Mesh parameter");
 
   // Output parameters
+  app.add_option("--save-dir", sim_param.save_dir, "Output directory")->capture_default_str()->group("Output parameters");
   app.add_option("--nfiles", sim_param.nfiles, "Number of output files")->capture_default_str()->group("Output parameters");
 
   /*--- Set and declare simulation parameters related to EOS ---*/
