@@ -26,8 +26,8 @@ int main(int argc, char* argv[]) {
   Simulation_Parameters<Number> sim_param;
 
   // Physical parameters
-  sim_param.xL = input.value("xL", static_cast<double>(0.0));
-  sim_param.xR = input.value("xR", static_cast<double>(1.0));
+  sim_param.xL = input.value("xL", 0.0);
+  sim_param.xR = input.value("xR", 1.0);
 
   sim_param.t0 = input.value("t0", static_cast<Number>(0.0));
   sim_param.Tf = input.value("Tf", static_cast<Number>(0.007));
