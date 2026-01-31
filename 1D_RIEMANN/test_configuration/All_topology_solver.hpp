@@ -243,7 +243,7 @@ void All_Topology_Solver<dim>::init_variables(const Riemann_Parameters<Number>& 
                               const auto x      = static_cast<Number>(center[0]);
 
                               if(x <= Riemann_param.xd) {
-                                conserved_variables[cell][Indices::ALPHA1_INDEX] = Riemann_param.alpha1L;
+                                conserved_variables[cell](Indices::ALPHA1_INDEX) = Riemann_param.alpha1L;
 
                                 p1[cell]      = Riemann_param.p1L;
                                 vel1[cell][0] = Riemann_param.u1L;
@@ -254,7 +254,7 @@ void All_Topology_Solver<dim>::init_variables(const Riemann_Parameters<Number>& 
                                 rho2[cell]    = Riemann_param.rho2L;
                               }
                               else {
-                                conserved_variables[cell][Indices::ALPHA1_INDEX] = Riemann_param.alpha1R;
+                                conserved_variables[cell](Indices::ALPHA1_INDEX) = Riemann_param.alpha1R;
 
                                 p1[cell]      = Riemann_param.p1R;
                                 vel1[cell][0] = Riemann_param.u1R;
@@ -267,50 +267,50 @@ void All_Topology_Solver<dim>::init_variables(const Riemann_Parameters<Number>& 
 
                               T1[cell] = EOS_phase1.T_value_RhoP(rho1[cell], p1[cell]);
 
-                              conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX] =
-                              conserved_variables[cell][Indices::ALPHA1_INDEX]*rho1[cell];
+                              conserved_variables[cell](Indices::ALPHA1_RHO1_INDEX) =
+                              conserved_variables[cell](Indices::ALPHA1_INDEX)*rho1[cell];
 
                               const auto e1   = EOS_phase1.e_value_RhoP(rho1[cell], p1[cell]);
                               auto norm2_vel1 = static_cast<Number>(0.0);
                               for(std::size_t d = 0; d < dim; ++d) {
-                                conserved_variables[cell][Indices::ALPHA1_RHO1_U1_INDEX + d] =
-                                conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX]*vel1[cell][d];
+                                conserved_variables[cell](Indices::ALPHA1_RHO1_U1_INDEX + d) =
+                                conserved_variables[cell](Indices::ALPHA1_RHO1_INDEX)*vel1[cell][d];
                                 norm2_vel1 += vel1[cell][d]*vel1[cell][d];
                               }
 
-                              conserved_variables[cell][Indices::ALPHA1_RHO1_E1_INDEX] =
-                              conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX]*
+                              conserved_variables[cell](Indices::ALPHA1_RHO1_E1_INDEX) =
+                              conserved_variables[cell](Indices::ALPHA1_RHO1_INDEX)*
                               (e1 + static_cast<Number>(0.5)*norm2_vel1);
 
                               T2[cell] = EOS_phase2.T_value_RhoP(rho2[cell], p2[cell]);
 
                               alpha2[cell] = static_cast<Number>(1.0)
-                                           - conserved_variables[cell][Indices::ALPHA1_INDEX];
-                              conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX] = alpha2[cell]*rho2[cell];
+                                           - conserved_variables[cell](Indices::ALPHA1_INDEX);
+                              conserved_variables[cell](Indices::ALPHA2_RHO2_INDEX) = alpha2[cell]*rho2[cell];
 
                               const auto e2   = EOS_phase2.e_value_RhoP(rho2[cell], p2[cell]);
                               auto norm2_vel2 = static_cast<Number>(0.0);
                               for(std::size_t d = 0; d < dim; ++d) {
-                                conserved_variables[cell][Indices::ALPHA2_RHO2_U2_INDEX + d] =
-                                conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX]*vel2[cell][d];
+                                conserved_variables[cell](Indices::ALPHA2_RHO2_U2_INDEX + d) =
+                                conserved_variables[cell](Indices::ALPHA2_RHO2_INDEX)*vel2[cell][d];
                                 norm2_vel2 += vel2[cell][d]*vel2[cell][d];
                               }
-                              conserved_variables[cell][Indices::ALPHA2_RHO2_E2_INDEX] =
-                              conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX]*
+                              conserved_variables[cell](Indices::ALPHA2_RHO2_E2_INDEX) =
+                              conserved_variables[cell](Indices::ALPHA2_RHO2_INDEX)*
                               (e2 + static_cast<Number>(0.5)*norm2_vel2);
 
                               c1[cell] = EOS_phase1.c_value_RhoP(rho1[cell], p1[cell]);
 
                               c2[cell] = EOS_phase2.c_value_RhoP(rho2[cell], p2[cell]);
 
-                              rho[cell] = conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX]
-                                        + conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX];
+                              rho[cell] = conserved_variables[cell](Indices::ALPHA1_RHO1_INDEX)
+                                        + conserved_variables[cell](Indices::ALPHA2_RHO2_INDEX);
 
                               p[cell] = conserved_variables[cell][Indices::ALPHA1_INDEX]*p1[cell]
                                       + alpha2[cell]*p2[cell];
 
-                              Y1[cell] = conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX]/rho[cell];
-                              Y2[cell] = conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX]/rho[cell];
+                              Y1[cell] = conserved_variables[cell](Indices::ALPHA1_RHO1_INDEX)/rho[cell];
+                              Y2[cell] = conserved_variables[cell](Indices::ALPHA2_RHO2_INDEX)/rho[cell];
 
                               for(std::size_t d = 0; d < dim; ++d) {
                                 vel[cell][d] = Y1[cell]*vel1[cell][d]
@@ -381,13 +381,15 @@ All_Topology_Solver<dim>::get_max_lambda() const {
   samurai::for_each_cell(mesh,
                          [&](const auto& cell)
                             {
-                              // Pre-fetch varaibles used multiple times in order to exploit (possible) vectorization
+                              // Pre-fetch variables used multiple times in order to exploit (possible) vectorization
                               // as well as to enhance readability
-                              const auto alpha1_loc = conserved_variables[cell][Indices::ALPHA1_INDEX];
-                              const auto m1_loc     = conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX];
-                              const auto m1E1_loc   = conserved_variables[cell][Indices::ALPHA1_RHO1_E1_INDEX];
-                              const auto m2_loc     = conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX];
-                              const auto m2E2_loc   = conserved_variables[cell][Indices::ALPHA2_RHO2_E2_INDEX];
+                              const auto& local_conserved_variables = conserved_variables[cell];
+
+                              const auto alpha1_loc = local_conserved_variables(Indices::ALPHA1_INDEX);
+                              const auto m1_loc     = local_conserved_variables(Indices::ALPHA1_RHO1_INDEX);
+                              const auto m1E1_loc   = local_conserved_variables(Indices::ALPHA1_RHO1_E1_INDEX);
+                              const auto m2_loc     = local_conserved_variables(Indices::ALPHA2_RHO2_INDEX);
+                              const auto m2E2_loc   = local_conserved_variables(Indices::ALPHA2_RHO2_E2_INDEX);
 
                               // Compute the fluid velocity and the speed of sound of phase 1
                               const auto rho1_loc   = m1_loc/alpha1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
@@ -395,7 +397,7 @@ All_Topology_Solver<dim>::get_max_lambda() const {
                                                       /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               auto e1_loc           = m1E1_loc*inv_m1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               for(std::size_t d = 0; d < dim; ++d) {
-                                vel1_loc[d] = conserved_variables[cell][Indices::ALPHA1_RHO1_U1_INDEX + d]*inv_m1_loc;
+                                vel1_loc[d] = local_conserved_variables(Indices::ALPHA1_RHO1_U1_INDEX + d)*inv_m1_loc;
                                               /*--- TODO: Add treatment for vanishing volume fraction ---*/
                                 e1_loc -= static_cast<Number>(0.5)*(vel1_loc[d]*vel1_loc[d]);
                               }
@@ -409,7 +411,7 @@ All_Topology_Solver<dim>::get_max_lambda() const {
                                                       /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               auto e2_loc           = m2E2_loc*inv_m2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               for(std::size_t d = 0; d < dim; ++d) {
-                                vel2_loc[d] = conserved_variables[cell][Indices::ALPHA2_RHO2_U2_INDEX + d]*inv_m2_loc;
+                                vel2_loc[d] = local_conserved_variables(Indices::ALPHA2_RHO2_U2_INDEX + d)*inv_m2_loc;
                                               /*--- TODO: Add treatment for vanishing volume fraction ---*/
                                 e2_loc -= static_cast<Number>(0.5)*(vel2_loc[d]*vel2_loc[d]);
                               }
@@ -440,108 +442,111 @@ void All_Topology_Solver<dim>::check_data() {
   samurai::for_each_cell(mesh,
                          [&](const auto& cell)
                             {
+                              // Pre-fetch local state
+                              const auto& local_conserved_variables = conserved_variables[cell];
+
                               // Start with the volume fraction
-                              if(conserved_variables[cell][Indices::ALPHA1_INDEX] < static_cast<Number>(0.0)) {
+                              if(local_conserved_variables(Indices::ALPHA1_INDEX) < static_cast<Number>(0.0)) {
                                 std::cerr << "Negative volume fraction for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(conserved_variables[cell][Indices::ALPHA1_INDEX] > static_cast<Number>(1.0)) {
+                              else if(local_conserved_variables(Indices::ALPHA1_INDEX) > static_cast<Number>(1.0)) {
                                 std::cerr << "Exceeding volume fraction for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(std::isnan(conserved_variables[cell][Indices::ALPHA1_INDEX])) {
+                              else if(std::isnan(local_conserved_variables(Indices::ALPHA1_INDEX))) {
                                 std::cerr << "NaN volume fraction for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(std::isinf(conserved_variables[cell][Indices::ALPHA1_INDEX])) {
+                              else if(std::isinf(local_conserved_variables(Indices::ALPHA1_INDEX))) {
                                 std::cerr << "Inf volume fraction for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
 
                               // Sanity check for m1
-                              if(conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX] < static_cast<Number>(0.0)) {
+                              if(local_conserved_variables(Indices::ALPHA1_RHO1_INDEX) < static_cast<Number>(0.0)) {
                                 std::cerr << "Negative mass for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(std::isnan(conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX])) {
+                              else if(std::isnan(local_conserved_variables(Indices::ALPHA1_RHO1_INDEX))) {
                                 std::cerr << "NaN mass for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(std::isinf(conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX])) {
+                              else if(std::isinf(local_conserved_variables(Indices::ALPHA1_RHO1_INDEX))) {
                                 std::cerr << "Inf mass for phase 1" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
 
                               // Sanity check for m2
-                              if(conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX] < static_cast<Number>(0.0)) {
+                              if(local_conserved_variables(Indices::ALPHA2_RHO2_INDEX) < static_cast<Number>(0.0)) {
                                 std::cerr << "Negative mass for phase 2" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(std::isnan(conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX])){
+                              else if(std::isnan(local_conserved_variables(Indices::ALPHA2_RHO2_INDEX))) {
                                 std::cerr << "NaN mass for phase 2" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
-                              else if(std::isinf(conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX])){
+                              else if(std::isinf(local_conserved_variables(Indices::ALPHA2_RHO2_INDEX))) {
                                 std::cerr << "Inf mass for phase 2" << std::endl;
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
@@ -552,8 +557,8 @@ void All_Topology_Solver<dim>::check_data() {
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
@@ -562,8 +567,8 @@ void All_Topology_Solver<dim>::check_data() {
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
@@ -574,8 +579,8 @@ void All_Topology_Solver<dim>::check_data() {
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
@@ -584,8 +589,8 @@ void All_Topology_Solver<dim>::check_data() {
                                 std::cerr << cell << std::endl;
                                 save("_diverged", conserved_variables,
                                                   rho, p, vel,
-                                                  vel1, rho1, p1, c1, T1, Y1,
-                                                  vel2, rho2, p2, c2, T2, alpha2, Y2,
+                                                  vel1, rho1, p1, c1, T1, s1, Y1,
+                                                  vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                                                   delta_pres, delta_temp, delta_vel);
                                 exit(1);
                               }
@@ -601,13 +606,15 @@ void All_Topology_Solver<dim>::update_auxiliary_fields() {
   samurai::for_each_cell(mesh,
                          [&](const auto& cell)
                             {
-                              // Pre-fetch varaibles used multiple times in order to exploit (possible) vectorization
+                              // Pre-fetch variables used multiple times in order to exploit (possible) vectorization
                               // as well as to enhance readability
-                              const auto alpha1_loc = conserved_variables[cell][Indices::ALPHA1_INDEX];
-                              const auto m1_loc     = conserved_variables[cell][Indices::ALPHA1_RHO1_INDEX];
-                              const auto m1E1_loc   = conserved_variables[cell][Indices::ALPHA1_RHO1_E1_INDEX];
-                              const auto m2_loc     = conserved_variables[cell][Indices::ALPHA2_RHO2_INDEX];
-                              const auto m2E2_loc   = conserved_variables[cell][Indices::ALPHA2_RHO2_E2_INDEX];
+                              const auto& local_conserved_variables = conserved_variables[cell];
+
+                              const auto alpha1_loc = local_conserved_variables(Indices::ALPHA1_INDEX);
+                              const auto m1_loc     = local_conserved_variables(Indices::ALPHA1_RHO1_INDEX);
+                              const auto m1E1_loc   = local_conserved_variables(Indices::ALPHA1_RHO1_E1_INDEX);
+                              const auto m2_loc     = local_conserved_variables(Indices::ALPHA2_RHO2_INDEX);
+                              const auto m2E2_loc   = local_conserved_variables(Indices::ALPHA2_RHO2_E2_INDEX);
 
                               // Compute the fields
                               const auto rho_loc     = m1_loc + m2_loc;
@@ -620,7 +627,7 @@ void All_Topology_Solver<dim>::update_auxiliary_fields() {
                                                       /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               auto e1_loc           = m1E1_loc*inv_m1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               for(std::size_t d = 0; d < dim; ++d) {
-                                vel1[cell][d] = conserved_variables[cell][Indices::ALPHA1_RHO1_U1_INDEX + d]*inv_m1_loc;
+                                vel1[cell][d] = local_conserved_variables(Indices::ALPHA1_RHO1_U1_INDEX + d)*inv_m1_loc;
                                                 /*--- TODO: Add treatment for vanishing volume fraction ---*/
                                 e1_loc -= static_cast<Number>(0.5)*(vel1[cell][d]*vel1[cell][d]);
                               }
@@ -637,7 +644,7 @@ void All_Topology_Solver<dim>::update_auxiliary_fields() {
                                                       /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               auto e2_loc           = m2E2_loc*inv_m2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
                               for(std::size_t d = 0; d < dim; ++d) {
-                                vel2[cell][d] = conserved_variables[cell][Indices::ALPHA2_RHO2_U2_INDEX + d]*inv_m2_loc;
+                                vel2[cell][d] = local_conserved_variables(Indices::ALPHA2_RHO2_U2_INDEX + d)*inv_m2_loc;
                                                 /*--- TODO: Add treatment for vanishing volume fraction ---*/
                                 e2_loc -= static_cast<Number>(0.5)*(vel2[cell][d]*vel2[cell][d]);
                               }
@@ -767,8 +774,8 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
       update_auxiliary_fields();
       save("_diverged", conserved_variables,
                         rho, p, vel,
-                        vel1, rho1, p1, c1, T1, Y1,
-                        vel2, rho2, p2, c2, T2, alpha2, Y2,
+                        vel1, rho1, p1, c1, T1, s1, Y1,
+                        vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                         delta_pres, delta_temp, delta_vel);
       exit(1);
     }
@@ -802,7 +809,7 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
                              {
                                output_data << std::setprecision(10)
                                            << std::setw(20) << std::left << cell.center()[0]
-                                           << std::setw(20) << std::left << conserved_variables[cell][Indices::ALPHA1_INDEX]
+                                           << std::setw(20) << std::left << conserved_variables[cell](Indices::ALPHA1_INDEX)
                                            << std::setw(20) << std::left << rho1[cell]
                                            << std::setw(20) << std::left << vel1[cell][0]
                                            << std::setw(20) << std::left << p1[cell]

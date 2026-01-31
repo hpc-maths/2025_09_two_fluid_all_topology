@@ -48,18 +48,18 @@ auto Reflecting(const Field& Q) {
     }
 
     for(std::size_t d = 0; d < Field::dim; ++d) {
-      Q_ghost[Indices::ALPHA1_RHO1_U1_INDEX + d] = Q[cell_in](Indices::ALPHA1_RHO1_U1_INDEX + d)
+      Q_ghost(Indices::ALPHA1_RHO1_U1_INDEX + d) = Q[cell_in](Indices::ALPHA1_RHO1_U1_INDEX + d)
                                                  - static_cast<typename Field::value_type>(2.0)*m1u1_dot_n*normal[d];
-      Q_ghost[Indices::ALPHA2_RHO2_U2_INDEX + d] = Q[cell_in](Indices::ALPHA2_RHO2_U2_INDEX + d)
+      Q_ghost(Indices::ALPHA2_RHO2_U2_INDEX + d) = Q[cell_in](Indices::ALPHA2_RHO2_U2_INDEX + d)
                                                  - static_cast<typename Field::value_type>(2.0)*m2u2_dot_n*normal[d];
     }
 
     /*--- Complete the ghost state with the inner state ---*/
-    Q_ghost[Indices::ALPHA1_INDEX]         = Q[cell_in][Indices::ALPHA1_INDEX];
-    Q_ghost[Indices::ALPHA1_RHO1_INDEX]    = Q[cell_in][Indices::ALPHA1_RHO1_INDEX];
-    Q_ghost[Indices::ALPHA2_RHO2_INDEX]    = Q[cell_in][Indices::ALPHA2_RHO2_INDEX];
-    Q_ghost[Indices::ALPHA1_RHO1_E1_INDEX] = Q[cell_in][Indices::ALPHA1_RHO1_E1_INDEX];
-    Q_ghost[Indices::ALPHA2_RHO2_E2_INDEX] = Q[cell_in][Indices::ALPHA2_RHO2_E2_INDEX];
+    Q_ghost(Indices::ALPHA1_INDEX)         = Q[cell_in](Indices::ALPHA1_INDEX);
+    Q_ghost(Indices::ALPHA1_RHO1_INDEX)    = Q[cell_in](Indices::ALPHA1_RHO1_INDEX);
+    Q_ghost(Indices::ALPHA2_RHO2_INDEX)    = Q[cell_in](Indices::ALPHA2_RHO2_INDEX);
+    Q_ghost(Indices::ALPHA1_RHO1_E1_INDEX) = Q[cell_in](Indices::ALPHA1_RHO1_E1_INDEX);
+    Q_ghost(Indices::ALPHA2_RHO2_E2_INDEX) = Q[cell_in](Indices::ALPHA2_RHO2_E2_INDEX);
 
     return Q_ghost;
   };
