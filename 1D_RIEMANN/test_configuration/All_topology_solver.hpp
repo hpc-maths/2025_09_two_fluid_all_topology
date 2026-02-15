@@ -211,7 +211,7 @@ void All_Topology_Solver<dim>::create_fields() {
 //
 template<std::size_t dim>
 void All_Topology_Solver<dim>::init_variables(const Riemann_Parameters<Number>& Riemann_param) {
-  /*--- Reisze fields since now mesh has been created ---*/
+  /*--- Resize fields since now mesh has been created ---*/
   conserved_variables.resize();
   rho.resize();
   p.resize();
