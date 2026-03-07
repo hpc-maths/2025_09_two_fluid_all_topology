@@ -32,13 +32,14 @@ namespace fs = std::filesystem;
 template<std::size_t dim>
 class All_Topology_Solver {
 public:
-  using Config  = samurai::MRConfig<dim>;
-  using Field   = samurai::VectorField<samurai::MRMesh<Config>,
-                                       double,
-                                       Utilities::EquationData<dim>::NVARS,
-                                       false>;
-  using Number  = samurai::Flux<Field>::Number;  /*--- Define the shortcut for the arithmetic type ---*/
-  using Indices = samurai::Flux<Field>::Indices; /*--- Shortcut for the indices storage ---*/
+  using Config    = samurai::MRConfig<dim>;
+  using mesh_type = samurai::MRMesh<Config>;
+  using Field     = samurai::VectorField<mesh_type,
+                                         double,
+                                         Utilities::EquationData<dim>::NVARS,
+                                         false>;
+  using Number    = samurai::Flux<Field>::Number;  /*--- Define the shortcut for the arithmetic type ---*/
+  using Indices   = samurai::Flux<Field>::Indices; /*--- Shortcut for the indices storage ---*/
 
   All_Topology_Solver() = default; /*--- Default constructor. This will do nothing
                                          and basically will never be used ---*/
@@ -60,10 +61,10 @@ private:
   /*--- Now we declare some relevant variables ---*/
   const samurai::Box<double, dim> box;
 
-  samurai::MRMesh<Config> mesh; /*--- Variable to store the mesh ---*/
+  mesh_type mesh; /*--- Variable to store the mesh ---*/
 
-  using Field_Scalar = samurai::ScalarField<decltype(mesh), Number>;
-  using Field_Vect   = samurai::VectorField<decltype(mesh), Number, dim, false>;
+  using Field_Scalar = samurai::ScalarField<mesh_type, Number>;
+  using Field_Vect   = samurai::VectorField<mesh_type, Number, dim, false>;
 
   const Number t0; /*--- Initial time of the simulation ---*/
   const Number Tf; /*--- Final time of the simulation ---*/
@@ -145,12 +146,17 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
   EOS_phase2(eos_param.gamma_2, eos_param.pi_infty_2, eos_param.q_infty_2, eos_param.c_v_2),
   path(sim_param.save_dir)
   {
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    if(rank == 0) {
+    #ifdef SAMURAI_WITH_MPI
+      int rank;
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      if(rank == 0) {
+        std::cout << "Initializing variables " << std::endl;
+        std::cout << std::endl;
+      }
+    #else
       std::cout << "Initializing variables " << std::endl;
       std::cout << std::endl;
-    }
+    #endif
 
     /*--- Attach the fields to the mesh ---*/
     create_fields();
@@ -435,11 +441,15 @@ All_Topology_Solver<dim>::get_max_lambda() const {
                             }
                         );
 
-  const double local_res_d = static_cast<double>(local_res);
-  double global_res;
-  MPI_Allreduce(&local_res_d, &global_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  #ifdef SAMURAI_WITH_MPI
+    const double local_res_d = static_cast<double>(local_res);
+    double global_res;
+    MPI_Allreduce(&local_res_d, &global_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
-  return static_cast<Number>(global_res);
+    return static_cast<Number>(global_res);
+  #else
+    return local_res;
+  #endif
 }
 
 // Auxiliary routine to check if spurious negative values arise
@@ -736,16 +746,22 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
 
   /*--- Set mesh size ---*/
   const auto dx = static_cast<Number>(mesh.cell_length(mesh.max_level()));
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  using mesh_id_t = typename decltype(mesh)::mesh_id_t;
-  const auto n_elements_per_subdomain = mesh[mesh_id_t::cells].nb_cells();
+  using mesh_id_t = typename mesh_type::mesh_id_t;
   unsigned n_elements;
-  MPI_Allreduce(&n_elements_per_subdomain, &n_elements, 1, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
-  if(rank == 0) {
+  #ifdef SAMURAI_WITH_MPI
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    const auto n_elements_per_subdomain = mesh[mesh_id_t::cells].nb_cells();
+    MPI_Allreduce(&n_elements_per_subdomain, &n_elements, 1, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+    if(rank == 0) {
+      std::cout << "Number of initial elements = " <<  n_elements << std::endl;
+      std::cout << std::endl;
+    }
+  #else
+    n_elements = mesh[mesh_id_t::cells].nb_cells();
     std::cout << "Number of initial elements = " <<  n_elements << std::endl;
     std::cout << std::endl;
-  }
+  #endif
 
   /*--- Start the loop ---*/
   std::size_t nsave = 0;
@@ -755,10 +771,15 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     // Compute time step
     dt = std::min(Tf - t, cfl*dx/get_max_lambda());
     t += dt;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    if(rank == 0) {
+
+    #ifdef SAMURAI_WITH_MPI
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      if(rank == 0) {
+        std::cout << fmt::format("Iteration {}: t = {}, dt = {}", ++nt, t, dt) << std::endl;
+      }
+    #else
       std::cout << fmt::format("Iteration {}: t = {}, dt = {}", ++nt, t, dt) << std::endl;
-    }
+    #endif
 
     // Apply the numerical scheme
     try {

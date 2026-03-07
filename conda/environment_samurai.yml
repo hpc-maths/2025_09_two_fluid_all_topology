@@ -3,15 +3,15 @@ channels:
   - conda-forge
 dependencies:
   - cmake
-  - cli11
-  - h5py
   - cxx-compiler
-  - samurai>=0.27
+  - cli11
+  - samurai=0.27
+  - h5py
   - matplotlib
-  - libboost-mpi < 1.87
+  - libboost-mpi
   - libboost-devel
   - libboost-headers
   - 'hdf5=*=mpi*'
-  - ffmpeg
-  - nlohmann_json
   - mpich
+  - nlohmann_json
+  - ffmpeg
