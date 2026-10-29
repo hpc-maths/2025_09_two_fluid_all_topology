@@ -13,9 +13,9 @@ reference-location: document
   <span>Marc Massot</span>
 </div>
 
-The goal here is to demonstrate the feasability of numerical simulations of a new *all-topology* two-fluid model [@haegeman2025] using a standard first-order finite-volume scheme.
+The goal here is to demonstrate the feasability of numerical simulations of a new *all-topology* two-fluid model [@haegeman2026] using a standard first-order finite-volume scheme.
 
-Hereafter, we provide the abstract of the contribution in which the model is derived, as well as a link to the full preprint.<br>
+Hereafter, we provide the abstract of the contribution in which the model is derived, as well as links to the published paper and to the preprint.<br>
 Next, details on the numerical scheme used and its implementation using the open-source **[samurai library](https://github.com/hpc-maths/samurai/)** are given before listing the numerical test cases.<br>
 At the end of this web-page, all the information necessary to install and run the code in order to reproduce the numerical data can be found.
 
@@ -23,11 +23,12 @@ At the end of this web-page, all the information necessary to install and run th
 ### Abstract
 We present a novel multi-fluid model for compressible two-phase flows. The model is derived through a newly developed Stationary Action Principle framework. It is fully closed and introduces a new interfacial quantity, the interfacial work. The closures for the interfacial quantities are provided by the variational principle. They are physically sound and well-defined for all type of flow topologies. The model is shown to be hyperbolic, symmetrizable, and admits an entropy conservation law. Its non-conservative products yield uniquely defined jump conditions which are provided. As such, it allows for the proper treatment of weak solutions. In the multi-dimensional setting, the model presents lift forces which are discussed. The model constitutes a sound basis for future numerical simulations.
 
+Published in *Proceedings of the Royal Society A*: [doi:10.1098/rspa.2025.0835](https://doi.org/10.1098/rspa.2025.0835)<br>
 Preprint available at [HAL-05249139](https://hal.science/hal-05249139)
 
 ### Numerical method and implementation
 
-The model has been implemented without the contributions related to the lift forces. We refer to [@haegeman2025] for a complete description of the model.
+The model has been implemented without the contributions related to the lift forces. We refer to [@haegeman2026] for a complete description of the model.
 Our implementation corresponds to a finite volume method on structured meshes represented by cartesian grids. On each inter-cell interface, the numerical flux is computed using an approximate Rieman solver.
 Here, we use the first-order non-conservative Rusanov scheme presented in [@crouzet2013]. Under a standard CFL condition, the scheme is positivity-preserving for the volume fraction and phasic densities.
 

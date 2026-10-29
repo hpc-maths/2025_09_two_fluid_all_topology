@@ -1,4 +1,4 @@
-This repository contains a numerical solver for the novel model presented in ``An all-topology two-fluid model for two-phase flows derived through Hamilton's Stationary Action Principle'' (https://hal.science/hal-05249139).
+This repository contains a numerical solver for the novel model presented in ``An all-topology two-fluid model for two-phase flows derived through Hamilton's Stationary Action Principle'', published in Proceedings of the Royal Society A 482(2334): 20250835 (2026), https://doi.org/10.1098/rspa.2025.0835 (preprint available at https://hal.science/hal-05249139).
 The implementation is carried out in the framework of [samurai](https://github.com/hpc-maths/samurai).
 The spatial discretization is based on the finite volume method using a non-conservative Rusanov flux.
 
@@ -18,7 +18,7 @@ We provide a conda environment file (```conda/environment_samurai.yml```) to fac
 
 ```bash
 conda env create -f conda/environment_samurai.yml
-conda activate samurai-0.27
+conda activate samurai-0.33
 ```
 
 Then, move into the directory with the test case of interest and run
