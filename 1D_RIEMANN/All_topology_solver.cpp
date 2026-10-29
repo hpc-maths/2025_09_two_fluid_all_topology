@@ -57,8 +57,8 @@ int main(int argc, char* argv[]) {
   app.add_option("--dt", sim_param.dt, "The time step")->capture_default_str()->group("Simulation parameters");
 
   // Mesh parameters
-  app.add_option("--min-level", sim_param.min_level, "Minimum level of the AMR")->capture_default_str()->group("Mesh parameter");
-  app.add_option("--max-level", sim_param.max_level, "Maximum level of the AMR")->capture_default_str()->group("Mesh parameter");
+  /*app.add_option("--min-level", sim_param.min_level, "Minimum level of the AMR")->capture_default_str()->group("Mesh parameter");
+  app.add_option("--max-level", sim_param.max_level, "Maximum level of the AMR")->capture_default_str()->group("Mesh parameter");*/
 
   // Output parameters
   app.add_option("--save-dir", sim_param.save_dir, "Output directory")->capture_default_str()->group("Output parameters");

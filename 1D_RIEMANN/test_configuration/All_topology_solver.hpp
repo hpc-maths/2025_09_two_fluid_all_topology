@@ -29,12 +29,11 @@ namespace fs = std::filesystem;
 template<std::size_t dim>
 class All_Topology_Solver {
 public:
-  using Config    = samurai::MRConfig<dim>;
-  using mesh_type = samurai::MRMesh<Config>;
+  using Config    = samurai::mesh_config<dim>;
+  using mesh_type = decltype(samurai::mra::make_empty_mesh(Config()));
   using Field     = samurai::VectorField<mesh_type,
                                          double,
-                                         Utilities::EquationData<dim>::NVARS,
-                                         false>;
+                                         Utilities::EquationData<dim>::NVARS>;
   using Number    = samurai::Flux<Field>::Number;  /*--- Define the shortcut for the arithmetic type ---*/
   using Indices   = samurai::Flux<Field>::Indices; /*--- Shortcut for the indices storage ---*/
 
@@ -64,7 +63,7 @@ private:
   samurai::MRMesh<Config> mesh; /*--- Variable to store the mesh ---*/
 
   using Field_Scalar = samurai::ScalarField<mesh_type, Number>;
-  using Field_Vect   = samurai::VectorField<mesh_type, Number, dim, false>;
+  using Field_Vect   = samurai::VectorField<mesh_type, Number, dim>;
 
   const Number t0; /*--- Initial time of the simulation ---*/
   const Number Tf; /*--- Final time of the simulation ---*/
@@ -158,11 +157,16 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
       std::cout << std::endl;
     #endif
 
+    /*--- Create empty mesh ---*/
+    auto config = Config().min_level(sim_param.min_level).max_level(sim_param.max_level).
+                           max_stencil_size(samurai::flux_stencil_size).periodic({false});
+    mesh = samurai::mra::make_empty_mesh(config);
+
     /*--- Attach the fields to the mesh ---*/
     create_fields();
 
     /*--- Initialize the fields ---*/
-    mesh = {box, sim_param.min_level, sim_param.max_level, {{false}}};
+    mesh = samurai::mra::make_mesh(box, config);
     init_variables(Riemann_param);
 
     /*--- Apply boundary conditions ---*/

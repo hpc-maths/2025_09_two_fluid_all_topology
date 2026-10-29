@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(relaxation)
 
-find_package(samurai 0.27.0)
+find_package(samurai 0.32.0)
 find_package(CLI11)
 find_package(nlohmann_json REQUIRED)
 find_package(MPI)
@@ -10,7 +10,7 @@ find_package(MPI)
 #include(FindPkgConfig)
 #pkg_check_modules(PETSC PETSc)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 
 add_executable(All_topology_test All_topology_solver.cpp)
 set_target_properties(All_topology_test PROPERTIES

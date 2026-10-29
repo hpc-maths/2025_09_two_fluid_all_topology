@@ -13,6 +13,12 @@
 
 namespace samurai {
   /**
+   * Stencil size of the numerical fluxes. It is defined outside the Flux class
+   * so that it can be employed also elsewhere.
+   */
+  inline static constexpr std::size_t flux_stencil_size = 2;
+
+  /**
     * Generic class to compute the flux between a left and right state
     */
   template<class Field>
@@ -21,7 +27,7 @@ namespace samurai {
     /*--- Definitions and sanity checks ---*/
     using Indices = Utilities::EquationData<Field::dim>;
     static_assert(Field::n_comp == Indices::NVARS, "The number of elements in the state does not correspond to the number of equations");
-    static constexpr std::size_t stencil_size = 2;
+    static constexpr std::size_t stencil_size = flux_stencil_size;
 
     using cfg = FluxConfig<SchemeType::NonLinear, stencil_size, Field, Field>;
 
