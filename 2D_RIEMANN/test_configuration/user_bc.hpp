@@ -38,7 +38,7 @@ auto Reflecting(const Field& Q) {
   return[&Q]
   (const auto& normal, const auto& cell_in, const auto& /*coord*/)
   {
-    /*--- Impose reflective bc ---*/
+    // Impose reflective bc
     xt::xtensor_fixed<typename Field::value_type, xt::xshape<Field::n_comp>> Q_ghost;
     auto m1u1_dot_n = static_cast<typename Field::value_type>(0.0);
     auto m2u2_dot_n = static_cast<typename Field::value_type>(0.0);
@@ -54,7 +54,7 @@ auto Reflecting(const Field& Q) {
                                                  - static_cast<typename Field::value_type>(2.0)*m2u2_dot_n*normal[d];
     }
 
-    /*--- Complete the ghost state with the inner state ---*/
+    // Complete the ghost state with the inner state
     Q_ghost(Indices::ALPHA1_INDEX)         = Q[cell_in](Indices::ALPHA1_INDEX);
     Q_ghost(Indices::ALPHA1_RHO1_INDEX)    = Q[cell_in](Indices::ALPHA1_RHO1_INDEX);
     Q_ghost(Indices::ALPHA2_RHO2_INDEX)    = Q[cell_in](Indices::ALPHA2_RHO2_INDEX);

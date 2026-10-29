@@ -34,60 +34,62 @@ public:
   using Field     = samurai::VectorField<mesh_type,
                                          double,
                                          Utilities::EquationData<dim>::NVARS>;
-  using Number    = samurai::Flux<Field>::Number;  /*--- Define the shortcut for the arithmetic type ---*/
-  using Indices   = samurai::Flux<Field>::Indices; /*--- Shortcut for the indices storage ---*/
+  using Number    = samurai::Flux<Field>::Number;  // Define the shortcut for the arithmetic type
+  using Indices   = samurai::Flux<Field>::Indices; // Shortcut for the indices storage
 
-  All_Topology_Solver() = default; /*--- Default constructor. This will do nothing
-                                         and basically will never be used ---*/
+  All_Topology_Solver() = default; // Default constructor. This will do nothing
+                                   // and basically will never be used
 
   All_Topology_Solver(const xt::xtensor_fixed<double, xt::xshape<dim>>& min_corner,
                       const xt::xtensor_fixed<double, xt::xshape<dim>>& max_corner,
                       const Simulation_Parameters<Number>& sim_param,
                       const EOS_Parameters<Number>& eos_param,
-                      const Riemann_Parameters<Number>& Riemann_param); /*--- Class constrcutor with the arguments related
-                                                                              to the grid and to the physics. ---*/
+                      const Riemann_Parameters<Number>& Riemann_param); // Class constructor with the arguments related
+                                                                        // to the grid and to the physics.
 
-  void run(const std::size_t nfiles = 10); /*--- Function which actually executes the temporal loop ---*/
+  void run(const std::size_t nfiles = 10); // Function which actually executes the temporal loop
 
   template<class... Variables>
   void save(const std::string& suffix,
-            const Variables&... fields); /*--- Routine to save the results ---*/
+            const Variables&... fields); // Routine to save the results
 
 private:
   std::ofstream output_data,
-                time_data;   /*--- Auxiliary output file to save relevant fields at final time and saving instants ---*/
+                time_data;   // Auxiliary output file to save relevant fields at final time and saving instants
 
   /*--- Now we declare some relevant variables ---*/
   const samurai::Box<double, dim> box;
 
-  samurai::MRMesh<Config> mesh; /*--- Variable to store the mesh ---*/
+  samurai::MRMesh<Config> mesh; // Variable to store the mesh
 
   using Field_Scalar = samurai::ScalarField<mesh_type, Number>;
   using Field_Vect   = samurai::VectorField<mesh_type, Number, dim>;
 
-  const Number t0; /*--- Initial time of the simulation ---*/
-  const Number Tf; /*--- Final time of the simulation ---*/
+  const Number t0; // Initial time of the simulation
+  const Number Tf; // Final time of the simulation
 
-  Number cfl; /*--- Courant number of the simulation so as to compute the time step ---*/
-  Number dt;  /*--- Time-step (in general modified according to CFL) ---*/
+  Number cfl; // Courant number of the simulation so as to compute the time step
+  Number dt;  // Time-step (in general modified according to CFL)
 
-  const SG_EOS<Number> EOS_phase1; /*--- Equation of state of phase 1 ---*/
-  const SG_EOS<Number> EOS_phase2; /*--- Equation of state of phase 2 ---*/
+  const SG_EOS<Number> EOS_phase1; // Equation of state of phase 1
+  const SG_EOS<Number> EOS_phase2; // Equation of state of phase 2
 
-  std::unique_ptr<samurai::Flux<Field>> numerical_flux_cons; /*--- function to compute the numerical flux for the conservative part
-                                                                   (this is necessary to call 'make_flux') ---*/
+  std::unique_ptr<samurai::Flux<Field>> numerical_flux_cons; // function to compute the numerical flux
+                                                             // for the conservative part
+                                                             // (this is necessary to call 'make_flux')
 
-  std::unique_ptr<samurai::Flux<Field>> numerical_flux_non_cons; /*--- function to compute the numerical flux for the non-conservative part
-                                                                       (this is necessary to call 'make_flux') ---*/
+  std::unique_ptr<samurai::Flux<Field>> numerical_flux_non_cons; // function to compute the numerical flux
+                                                                 // for the non-conservative part
+                                                                 // (this is necessary to call 'make_flux')
 
-  fs::path    path;     /*--- Auxiliary variable to store the output directory ---*/
-  std::string filename; /*--- Auxiliary variable to store the name of output ---*/
+  fs::path    path;     // Auxiliary variable to store the output directory
+  std::string filename; // Auxiliary variable to store the name of output
 
-  Field conserved_variables; /*--- The variable which stores the conserved variables,
-                                   namely the variables for which we solve a PDE system ---*/
+  Field conserved_variables; // The variable which stores the conserved variables,
+                             // namely the variables for which we solve a PDE system
 
-  /*-- Now we declare a bunch of fields which depend from the state, but it is useful
-       to have it for the output ---*/
+  /*--- Now we declare a bunch of fields which depend from the state, but it is useful
+        to have it for the output ---*/
   Field_Scalar rho,
                p,
                rho1,
@@ -112,22 +114,23 @@ private:
              delta_vel;
 
   /*--- Now, it's time to declare some member functions that we will employ ---*/
-  void create_fields(); /*--- Auxiliary routine to initialize the fileds to the mesh ---*/
+  void create_fields(); // Auxiliary routine to initialize the fields to the mesh
 
-  void init_variables(const Riemann_Parameters<Number>& Riemann_param); /*--- Routine to initialize the variables
-                                                                              (both conserved and auxiliary, this is problem dependent) ---*/
+  void init_variables(const Riemann_Parameters<Number>& Riemann_param); // Routine to initialize the variables
+                                                                        // (both conserved and auxiliary,
+                                                                        // this is problem dependent)
 
-  void apply_bcs(const Riemann_Parameters<Number>& Riemann_param); /*--- Auxiliary routine for the boundary conditions ---*/
+  void apply_bcs(const Riemann_Parameters<Number>& Riemann_param); // Auxiliary routine for the boundary conditions
 
-  Number get_max_lambda() const; /*--- Compute the estimate of the maximum eigenvalue ---*/
+  Number get_max_lambda() const; // Compute the estimate of the maximum eigenvalue
 
-  void check_data(); /*--- Auxiliary routine to check if (small) spurious negative values are present ---*/
+  void check_data(); // Auxiliary routine to check if (small) spurious negative values are present
 
-  void update_auxiliary_fields(); /*--- Routine to update auxiliary fields for output and time step update ---*/
+  void update_auxiliary_fields(); // Routine to update auxiliary fields for output and time step update
 };
 
 //////////////////////////////////////////////////////////////
-/*---- START WITH THE IMPLEMENTATION OF THE CONSTRUCTOR ---*/
+// START WITH THE IMPLEMENTATION OF THE CONSTRUCTOR
 //////////////////////////////////////////////////////////////
 
 // Implement class constructor
@@ -157,22 +160,22 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
       std::cout << std::endl;
     #endif
 
-    /*--- Create empty mesh ---*/
+    // Create empty mesh
     auto config = Config().min_level(sim_param.min_level).max_level(sim_param.max_level).
                            max_stencil_size(samurai::flux_stencil_size).periodic({false});
     mesh = samurai::mra::make_empty_mesh(config);
 
-    /*--- Attach the fields to the mesh ---*/
+    // Attach the fields to the mesh
     create_fields();
 
-    /*--- Initialize the fields ---*/
+    // Initialize the fields
     mesh = samurai::mra::make_mesh(box, config);
     init_variables(Riemann_param);
 
-    /*--- Apply boundary conditions ---*/
+    // Apply boundary conditions
     apply_bcs(Riemann_param);
 
-    /*--- Initiliaze the numerical fluxes ---*/
+    // Initialize the numerical fluxes
     numerical_flux_cons = std::make_unique<samurai::RusanovFlux<Field>>(EOS_phase1, EOS_phase2);
     numerical_flux_cons->set_flux_name("Rusanov");
 
@@ -184,7 +187,7 @@ All_Topology_Solver<dim>::All_Topology_Solver(const xt::xtensor_fixed<double, xt
 //
 template<std::size_t dim>
 void All_Topology_Solver<dim>::create_fields() {
-  /*--- Create conserved and auxiliary fields ---*/
+  // Create conserved and auxiliary fields
   conserved_variables = samurai::make_vector_field<Number, Field::n_comp>("conserved", mesh);
 
   rho  = samurai::make_scalar_field<Number>("rho", mesh);
@@ -221,7 +224,7 @@ void All_Topology_Solver<dim>::create_fields() {
 //
 template<std::size_t dim>
 void All_Topology_Solver<dim>::init_variables(const Riemann_Parameters<Number>& Riemann_param) {
-  /*--- Resize fields since now mesh has been created ---*/
+  // Resize fields since now mesh has been created
   conserved_variables.resize();
   rho.resize();
   p.resize();
@@ -245,7 +248,7 @@ void All_Topology_Solver<dim>::init_variables(const Riemann_Parameters<Number>& 
   delta_temp.resize();
   delta_vel.resize();
 
-  /*--- Initialize the fields with a loop over all cells ---*/
+  // Initialize the fields with a loop over all cells
   samurai::for_each_cell(mesh,
                          [&](const auto& cell)
                             {
@@ -375,7 +378,7 @@ void All_Topology_Solver<dim>::apply_bcs(const Riemann_Parameters<Number>& Riema
 }
 
 //////////////////////////////////////////////////////////////
-/*---- FOCUS NOW ON THE AUXILIARY FUNCTIONS ---*/
+// FOCUS NOW ON THE AUXILIARY FUNCTIONS
 /////////////////////////////////////////////////////////////
 
 // Compute the estimate of the maximum eigenvalue for CFL condition
@@ -402,13 +405,15 @@ All_Topology_Solver<dim>::get_max_lambda() const {
                               const auto m2E2_loc   = local_conserved_variables(Indices::ALPHA2_RHO2_E2_INDEX);
 
                               // Compute the fluid velocity and the speed of sound of phase 1
-                              const auto rho1_loc   = m1_loc/alpha1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              const auto rho1_loc   = m1_loc/alpha1_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               const auto inv_m1_loc = static_cast<Number>(1.0)/m1_loc;
-                                                      /*--- TODO: Add treatment for vanishing volume fraction ---*/
-                              auto e1_loc           = m1E1_loc*inv_m1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                                      // TODO: Add treatment for vanishing volume fraction
+                              auto e1_loc           = m1E1_loc*inv_m1_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               for(std::size_t d = 0; d < dim; ++d) {
                                 vel1_loc[d] = local_conserved_variables(Indices::ALPHA1_RHO1_U1_INDEX + d)*inv_m1_loc;
-                                              /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                              // TODO: Add treatment for vanishing volume fraction
                                 e1_loc -= static_cast<Number>(0.5)*(vel1_loc[d]*vel1_loc[d]);
                               }
                               const auto p1_loc = EOS_phase1.pres_value_Rhoe(rho1_loc, e1_loc);
@@ -416,13 +421,15 @@ All_Topology_Solver<dim>::get_max_lambda() const {
 
                               // Compute the fluid velocity and the speed of sound of phase 2
                               const auto alpha2_loc = static_cast<Number>(1.0) - alpha1_loc;
-                              const auto rho2_loc   = m2_loc/alpha2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              const auto rho2_loc   = m2_loc/alpha2_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               const auto inv_m2_loc = static_cast<Number>(1.0)/m2_loc;
-                                                      /*--- TODO: Add treatment for vanishing volume fraction ---*/
-                              auto e2_loc           = m2E2_loc*inv_m2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                                      // TODO: Add treatment for vanishing volume fraction
+                              auto e2_loc           = m2E2_loc*inv_m2_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               for(std::size_t d = 0; d < dim; ++d) {
                                 vel2_loc[d] = local_conserved_variables(Indices::ALPHA2_RHO2_U2_INDEX + d)*inv_m2_loc;
-                                              /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                              // TODO: Add treatment for vanishing volume fraction
                                 e2_loc -= static_cast<Number>(0.5)*(vel2_loc[d]*vel2_loc[d]);
                               }
                               const auto p2_loc = EOS_phase2.pres_value_Rhoe(rho2_loc, e2_loc);
@@ -616,7 +623,7 @@ void All_Topology_Solver<dim>::check_data() {
 //
 template<std::size_t dim>
 void All_Topology_Solver<dim>::update_auxiliary_fields() {
-  /*--- Loop over all cells ---*/
+  // Loop over all cells
   samurai::for_each_cell(mesh,
                          [&](const auto& cell)
                             {
@@ -635,14 +642,16 @@ void All_Topology_Solver<dim>::update_auxiliary_fields() {
                               const auto inv_rho_loc = static_cast<Number>(1.0)/rho_loc;
                               rho[cell]              = rho_loc;
 
-                              const auto rho1_loc   = m1_loc/alpha1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              const auto rho1_loc   = m1_loc/alpha1_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               rho1[cell]            = rho1_loc;
                               const auto inv_m1_loc = static_cast<Number>(1.0)/m1_loc;
-                                                      /*--- TODO: Add treatment for vanishing volume fraction ---*/
-                              auto e1_loc           = m1E1_loc*inv_m1_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                                      // TODO: Add treatment for vanishing volume fraction
+                              auto e1_loc           = m1E1_loc*inv_m1_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               for(std::size_t d = 0; d < dim; ++d) {
                                 vel1[cell][d] = local_conserved_variables(Indices::ALPHA1_RHO1_U1_INDEX + d)*inv_m1_loc;
-                                                /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                                // TODO: Add treatment for vanishing volume fraction
                                 e1_loc -= static_cast<Number>(0.5)*(vel1[cell][d]*vel1[cell][d]);
                               }
                               const auto p1_loc = EOS_phase1.pres_value_Rhoe(rho1_loc, e1_loc);
@@ -652,14 +661,16 @@ void All_Topology_Solver<dim>::update_auxiliary_fields() {
                               T1[cell]          = T1_loc;
 
                               const auto alpha2_loc = static_cast<Number>(1.0) - alpha1_loc;
-                              const auto rho2_loc   = m2_loc/alpha2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                              const auto rho2_loc   = m2_loc/alpha2_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               rho2[cell]            = rho2_loc;
                               const auto inv_m2_loc = static_cast<Number>(1.0)/m2_loc;
-                                                      /*--- TODO: Add treatment for vanishing volume fraction ---*/
-                              auto e2_loc           = m2E2_loc*inv_m2_loc; /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                                      // TODO: Add treatment for vanishing volume fraction
+                              auto e2_loc           = m2E2_loc*inv_m2_loc;
+                                                      // TODO: Add treatment for vanishing volume fraction
                               for(std::size_t d = 0; d < dim; ++d) {
                                 vel2[cell][d] = local_conserved_variables(Indices::ALPHA2_RHO2_U2_INDEX + d)*inv_m2_loc;
-                                                /*--- TODO: Add treatment for vanishing volume fraction ---*/
+                                                // TODO: Add treatment for vanishing volume fraction
                                 e2_loc -= static_cast<Number>(0.5)*(vel2[cell][d]*vel2[cell][d]);
                               }
                               const auto p2_loc = EOS_phase2.pres_value_Rhoe(rho2_loc, e2_loc);
@@ -712,26 +723,26 @@ void All_Topology_Solver<dim>::save(const std::string& suffix,
 }
 
 //////////////////////////////////////////////////////////////
-/*---- IMPLEMENT THE FUNCTION THAT EFFECTIVELY SOLVES THE PROBLEM ---*/
+// IMPLEMENT THE FUNCTION THAT EFFECTIVELY SOLVES THE PROBLEM
 /////////////////////////////////////////////////////////////
 
 // Implement the function that effectively performs the temporal loop
 //
 template<std::size_t dim>
 void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
-  /*--- Default output arguemnts ---*/
+  // Default output arguments
   filename = "Rusanov_Flux_order1";
 
   const auto dt_save = Tf/static_cast<Number>(nfiles);
 
-  /*--- Auxiliary variables to save updated fields ---*/
+  // Auxiliary variables to save updated fields
   auto conserved_variables_np1 = samurai::make_vector_field<Number, Field::n_comp>("conserved_np1", mesh);
 
-  /*--- Create the flux variables ---*/
+  // Create the flux variables
   auto Rusanov_flux         = numerical_flux_cons->make_flux();
   auto NonConservative_flux = numerical_flux_non_cons->make_flux();
 
-  /*--- Save the initial condition ---*/
+  // Save the initial condition
   const std::string suffix_init = (nfiles != 1) ? "_ite_" + Utilities::unsigned_to_string(0) : "";
   save(suffix_init, conserved_variables,
                     rho, p, vel,
@@ -742,7 +753,7 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
   time_data << static_cast<Number>(t0) << std::endl;
   time_data.close();
 
-  /*--- Set mesh size ---*/
+  // Set mesh size
   const auto dx = static_cast<Number>(mesh.cell_length(mesh.max_level()));
   using mesh_id_t = typename mesh_type::mesh_id_t;
   unsigned n_elements;
@@ -761,7 +772,7 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
     std::cout << std::endl;
   #endif
 
-  /*--- Start the loop ---*/
+  // Start the loop
   std::size_t nsave = 0;
   std::size_t nt    = 0;
   auto t            = static_cast<Number>(t0);
@@ -813,12 +824,12 @@ void All_Topology_Solver<dim>::run(const std::size_t nfiles) {
                    vel2, rho2, p2, c2, T2, s2, alpha2, Y2,
                    delta_pres, delta_temp, delta_vel);
 
-      /*--- Save the instant of the saving ---*/
+      // Save the instant of the saving
       time_data.open(path.string() + "/time_save.dat", std::ios_base::app);
       time_data << t << std::endl;
       time_data.close();
 
-      /*--- Save fields in a output file ---*/
+      // Save fields in a output file
       output_data.open(path.string() + "/output_data.dat", std::ofstream::out);
       samurai::for_each_cell(mesh,
                              [&](const auto& cell)

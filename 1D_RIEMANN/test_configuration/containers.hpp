@@ -11,22 +11,22 @@
 //
 template<typename T = double>
 struct Simulation_Parameters {
-  /*--- Physical parameters ---*/
+  // Physical parameters
   double xL;
   double xR;
 
   T t0;
   T Tf;
 
-  /*--- Numerical parameters ---*/
+  // Numerical parameters
   T Courant;
   T dt;
 
-  /*--- Mesh parameters ---*/
+  // Mesh parameters
   std::size_t min_level;
   std::size_t max_level;
 
-  /*--- Output parameters ---*/
+  // Output parameters
   std::string save_dir;
   std::size_t nfiles;
 };
@@ -35,13 +35,13 @@ struct Simulation_Parameters {
 //
 template<typename T = double>
 struct EOS_Parameters {
-  /*--- SG-EOS parameters phase 1 ---*/
+  // SG-EOS parameters phase 1
   T gamma_1;
   T pi_infty_1;
   T q_infty_1;
   T c_v_1;
 
-  /*--- SG-EOS parameters phase 2 ---*/
+  // SG-EOS parameters phase 2
   T gamma_2;
   T pi_infty_2;
   T q_infty_2;
@@ -52,10 +52,10 @@ struct EOS_Parameters {
 //
 template<typename T = double>
 struct Riemann_Parameters {
-  /*--- Initial discontinuity location ---*/
+  // Initial discontinuity location
   T xd;
 
-  /*--- Left state ---*/
+  // Left state
   T alpha1L;
   T rho1L;
   T p1L;
@@ -66,7 +66,7 @@ struct Riemann_Parameters {
   T T2L;
   T u2L;
 
-  /*--- Right state ---*/
+  // Right state
   T alpha1R;
   T rho1R;
   T p1R;

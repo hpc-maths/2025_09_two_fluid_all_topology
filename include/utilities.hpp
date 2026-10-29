@@ -29,7 +29,7 @@ namespace Utilities {
   //
   template<std::size_t dim>
   struct EquationData {
-    /*--- Declare suitable static variables for the sake of generalities in the indices ---*/
+    // Declare suitable static variables for the sake of generalities in the indices
     static constexpr std::size_t ALPHA1_INDEX         = 0;
     static constexpr std::size_t ALPHA1_RHO1_INDEX    = 1;
     static constexpr std::size_t ALPHA1_RHO1_U1_INDEX = 2;

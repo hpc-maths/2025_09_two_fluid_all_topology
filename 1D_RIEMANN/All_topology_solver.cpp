@@ -78,12 +78,12 @@ int main(int argc, char* argv[]) {
   eos_param.c_v_2      = input.value("c_v_2", static_cast<Number>(1.040e3));
 
   /*--- Allow for parsing from command line ---*/
-  app.add_option("--gammma_1", eos_param.gamma_1, "gamma_1")->capture_default_str()->group("EOS parameters");
+  app.add_option("--gamma_1", eos_param.gamma_1, "gamma_1")->capture_default_str()->group("EOS parameters");
   app.add_option("--pi_infty_1", eos_param.pi_infty_1, "pi_infty_1")->capture_default_str()->group("EOS parameters");
   app.add_option("--q_infty_1", eos_param.q_infty_1, "q_infty_1")->capture_default_str()->group("EOS parameters");
   app.add_option("--c_v_1", eos_param.c_v_1, "c_v_1")->capture_default_str()->group("EOS parameters");
 
-  app.add_option("--gammma_2", eos_param.gamma_2, "gamma_2")->capture_default_str()->group("EOS parameters");
+  app.add_option("--gamma_2", eos_param.gamma_2, "gamma_2")->capture_default_str()->group("EOS parameters");
   app.add_option("--pi_infty_2", eos_param.pi_infty_2, "pi_infty_2")->capture_default_str()->group("EOS parameters");
   app.add_option("--q_infty_2", eos_param.q_infty_2, "q_infty_2")->capture_default_str()->group("EOS parameters");
   app.add_option("--c_v_2", eos_param.c_v_2, "c_v_2")->capture_default_str()->group("EOS parameters");
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
   app.add_option("--rho1R", Riemann_param.rho1R, "Initial density phase 1 at right")->capture_default_str()->group("Initial conditions");
   app.add_option("--p1R", Riemann_param.p1R, "Initial pressure phase 1 at right")->capture_default_str()->group("Initial conditions");
   app.add_option("--T1R", Riemann_param.T1R, "Initial temperature phase 1 at right")->capture_default_str()->group("Initial conditions");
-  app.add_option("--u1R", Riemann_param.u1R, "Initial horizotnal velocity phase 1 at right")->capture_default_str()->group("Initial conditions");
+  app.add_option("--u1R", Riemann_param.u1R, "Initial horizontal velocity phase 1 at right")->capture_default_str()->group("Initial conditions");
 
   app.add_option("--rho2R", Riemann_param.rho2R, "Initial density phase 2 at right")->capture_default_str()->group("Initial conditions");
   app.add_option("--p2R", Riemann_param.p2R, "Initial pressure phase 2 at right")->capture_default_str()->group("Initial conditions");
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
   /*--- Create the instance of the class to perform the simulation ---*/
   CLI11_PARSE(app, argc, argv);
   if(sim_param.min_level != sim_param.max_level) {
-    std::cerr << "min-level different that max-level: "
+    std::cerr << "min-level different than max-level: "
               << "multi-resolution not supported in current implementation. Check input file."
               << std::endl;
     exit(1);
